@@ -162,6 +162,14 @@
   .day .posts{display:flex;flex-direction:column;gap:5px}
   .day.sel{border-color:var(--navy)}
   .lbls{display:none}
+  .home{max-width:720px;margin:0 auto;display:grid;gap:16px}
+  .home h1{font-size:24px}
+  .tbar{background:linear-gradient(120deg,#0b1428,#1c2f57);color:var(--gold2);border-radius:14px;padding:14px 18px;display:grid;gap:10px;font-weight:700;border:1px solid rgba(201,162,74,.35)}
+  .tbar .n{font-size:18px}
+  .tbar .bar{height:8px;background:rgba(230,201,127,.2);border-radius:8px;overflow:hidden}
+  .tbar .bar i{display:block;height:100%;background:var(--gold2);border-radius:8px;transition:width .3s}
+  .grp{font-size:11.5px;font-weight:800;color:var(--muted);margin:14px 0 2px;letter-spacing:.3px}
+  .grp:first-of-type{margin-top:2px}
   .mtop{display:none;align-items:center;gap:10px;background:var(--navy);color:var(--gold2);padding:calc(10px + env(safe-area-inset-top)) 14px 10px;position:sticky;top:0;z-index:30;box-shadow:0 4px 16px rgba(0,0,0,.2)}
   .mtop .logo{width:32px;height:32px;font-size:16px;border-radius:10px}
   .mtop b{font-size:18px;flex:1}
@@ -246,6 +254,7 @@ const L = {
 en:{
  sync_cloud:'☁ Synced to your account', sync_saving:'⟳ Saving…', sync_local:'Saved on this device', sync_err:'⚠ Not synced — check your internet',
  side_cloud:'Your data syncs to your Claude account. Open the same link on your phone and laptop.', export_fail:'Could not save the file here — try from a computer.', restore_btn:'Restore',
+ todo_today:'To do today', g_routine:'Routine', g_tasks:'Tasks', g_posts:'Posts to publish', add_appt:'+ Appointment', all_clear:'Nothing else for today ✨',
  tagline:'Media buying workspace', ns_today:'Today', ns_agenda:'Agenda', ns_camps:'Campaigns', ns_clients:'Clients', ns_cal:'Calendar', ns_settings:'Settings', nav_today:'Today', nav_camps:'Campaigns', nav_clients:'Clients', nav_cal:'Content Calendar', nav_settings:'Routine & Settings',
  side_foot:'Your data is saved in this browser. Back it up from Settings.',
  gm:'Good morning', ga:'Good afternoon', ge:'Good evening', hello:'{0}, Marina 👋',
@@ -328,6 +337,7 @@ en:{
 ar:{
  sync_cloud:'☁ متزامن مع حسابك', sync_saving:'⟳ بيحفظ…', sync_local:'محفوظ على الجهاز ده', sync_err:'⚠ متزامنش — اتأكدي من النت',
  side_cloud:'بياناتك بتتزامن مع حساب Claude بتاعك. افتحي نفس اللينك على الموبايل واللاب توب.', export_fail:'مقدرتش أحفظ الملف هنا — جربي من الكمبيوتر.', restore_btn:'استرجاع',
+ todo_today:'مطلوب النهاردة', g_routine:'الروتين', g_tasks:'مهام', g_posts:'بوستات تنزل النهاردة', add_appt:'+ موعد', all_clear:'مفيش حاجة تانية النهاردة ✨',
  tagline:'مساحة شغل الميديا باينج', ns_today:'النهاردة', ns_agenda:'مواعيدي', ns_camps:'الكامبينز', ns_clients:'العملاء', ns_cal:'الكالندر', ns_settings:'الإعدادات', nav_today:'النهاردة', nav_camps:'الكامبينز', nav_clients:'العملاء', nav_cal:'كالندر المحتوى', nav_settings:'الروتين والإعدادات',
  side_foot:'بياناتك محفوظة في المتصفح ده. خدي نسخة احتياطية من الإعدادات.',
  gm:'صباح الخير', ga:'مساء الخير', ge:'مساء الخير', hello:'{0} يا مارينا 👋',
@@ -567,8 +577,8 @@ function todayInfo(){
   const tasks=S.tasks.filter(x=>x.date===td || (x.date<td && !x.done));
   const alerts=S.campaigns.filter(c=>c.status==='active').map(c=>({c,a:analyze(c)})).filter(x=>x.a.health==='bad'||x.a.health==='watch');
   const agenda=occ(td), agDone=agenda.filter(e=>evIsDone(e.id,td)).length;
-  const total=S.routine.length+active.length*2+postsToday.length+tasks.length+newC.length+agenda.length;
-  const done=S.routine.filter(r=>ch['r_'+r.id]).length + active.reduce((n,c)=>n+(ch['acc_'+c.id]?1:0)+(ch['cmp_'+c.id]?1:0),0) + postsToday.filter(p=>p.done).length + tasks.filter(x=>x.done).length + agDone;
+  const total=S.routine.length+postsToday.length+tasks.length+agenda.length;
+  const done=S.routine.filter(r=>ch['r_'+r.id]).length + postsToday.filter(p=>p.done).length + tasks.filter(x=>x.done).length + agDone;
   return {td,ch,active,newC,postsToday,overdue,tasks,alerts,agenda,agLeft:agenda.length-agDone,total,done,left:total-done};
 }
 
@@ -606,44 +616,32 @@ function vToday(I){
   const h=new Date().getHours(), greet=h<12?t('gm'):h<17?t('ga'):t('ge');
   const pct=I.total?I.done/I.total:0;
   const msg=I.total===0?t('msg_start'):I.left===0?t('msg_done'):t('msg_left',I.left);
-  return `
-  <div class="head"><div><h1>${t('hello',greet)}</h1><div class="sub">${fmt(I.td,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div></div>
-    <div class="row"><button class="btn ghost" onclick="openTask()">${t('btn_task')}</button><button class="btn" onclick="openClient()">${t('btn_client')}</button></div></div>
-  <div class="banner"><div><div class="big">${msg}</div><div style="opacity:.85;margin-top:4px">${t('checks_done',I.done,I.total)}</div></div>${ring(pct)}</div>
-  <div class="stats">${stat(I.active.length,t('s_active'))}${stat(I.newC.length,t('s_new'))}${stat(I.postsToday.length,t('s_posts'))}
-    ${stat(I.overdue.length,t('s_overdue'),I.overdue.length?'var(--bad)':'')}${stat(I.alerts.length,t('s_alerts'),I.alerts.length?'var(--warn)':'')}</div>
-  <div class="grid g2">
-    <div class="grid" style="align-content:start">
-      <div class="card"><h2>☑ ${t('routine')} <span class="tag">${S.routine.filter(r=>I.ch['r_'+r.id]).length}/${S.routine.length}</span></h2>
-        ${S.routine.map(r=>chk(I.ch['r_'+r.id],`togCheck('r_${r.id}')`,rText(r))).join('')||`<div class="empty">${t('routine_empty')}</div>`}</div>
-      <div class="card"><h2>📊 ${t('checkin')} <span class="tag">${t('tag_active')}</span></h2>
+  const taskRow=x=>`<div class="check ${x.done?'done':''}"><div class="box ${x.done?'on':''}" onclick="togTask('${x.id}')"></div><div class="txt">${esc(x.text)}${x.clientId&&client(x.clientId)?` <span class="meta">· ${esc(client(x.clientId).name)}</span>`:''}${x.date<I.td?` <span class="pill over">${t('from',fmt(x.date))}</span>`:''}</div><button class="x" onclick="delTask('${x.id}')">✕</button></div>`;
+  const grp=(label,html)=>html?`<div class="grp">${label}</div>${html}`:'';
+  const todo = grp(t('g_routine'),S.routine.map(r=>chk(I.ch['r_'+r.id],`togCheck('r_${r.id}')`,rText(r))).join(''))
+    + grp(t('g_tasks'),I.tasks.map(taskRow).join(''))
+    + grp(t('g_posts'),I.postsToday.map(p=>postRow(p)).join(''))
+    + grp(`<span style="color:var(--bad)">${t('overdue')}</span>`,I.overdue.map(p=>postRow(p,true)).join(''));
+  const todoDone=S.routine.filter(r=>I.ch['r_'+r.id]).length+I.tasks.filter(x=>x.done).length+I.postsToday.filter(p=>p.done).length;
+  const todoAll=S.routine.length+I.tasks.length+I.postsToday.length;
+  return `<div class="home">
+  <div><h1>${t('hello',greet)}</h1><div class="sub">${fmt(I.td,{weekday:'long',day:'numeric',month:'long'})}</div></div>
+  <div class="tbar"><div class="row" style="justify-content:space-between"><span>${msg}</span><span class="n">${Math.round(pct*100)}%</span></div><div class="bar"><i style="width:${pct*100}%"></i></div></div>
+  <div class="card"><h2>📅 ${t('ag_today')} <span class="tag">${I.agenda.length-I.agLeft}/${I.agenda.length}</span></h2>
+    ${I.agenda.length?I.agenda.map(e=>evRow(e,I.td)).join(''):`<div class="empty">${t('ag_empty_today')}</div>`}
+    <div class="quick"><button class="btn sm ghost" onclick="openEvent()">${t('add_appt')}</button></div></div>
+  <div class="card"><h2>✅ ${t('todo_today')} <span class="tag">${todoDone}/${todoAll}</span></h2>
+    ${todo||`<div class="empty">${t('all_clear')}</div>`}
+    <form class="quick" onsubmit="quickTask(event)"><input id="qt" placeholder="${t('task_ph')}"><button class="btn sm">${t('add')}</button></form></div>
+  </div>`;
+}
+function checkinCard(I){
+  return `<div class="card" style="margin-bottom:18px"><h2>📊 ${t('checkin')} <span class="tag">${t('tag_active')}</span></h2>
         ${I.active.length?`<div class="ci h"><div>${t('col_client')}</div><div class="c">${t('col_acc')}</div><div class="c">${t('col_cmp')}</div></div>`+
           I.active.map(c=>`<div class="ci"><div class="who"><i class="dot" style="background:${c.color}"></i><span>${esc(c.name)}</span>${c.platform?`<span class="meta">· ${esc(c.platform)}</span>`:''}</div>
           <div class="c"><div class="box ${I.ch['acc_'+c.id]?'on':''}" onclick="togCheck('acc_${c.id}')"></div></div>
           <div class="c"><div class="box ${I.ch['cmp_'+c.id]?'on':''}" onclick="togCheck('cmp_${c.id}')"></div></div></div>`).join('')
-          :`<div class="empty">${t('checkin_empty')}</div>`}</div>
-      <div class="card"><h2>📈 ${t('alerts_title')} <span class="tag">${I.alerts.length}</span></h2>
-        ${I.alerts.length?I.alerts.map(({c,a})=>{const cl=client(c.clientId); const top=a.items.find(i=>i.lvl===a.health)||a.items[0];
-          return `<div class="alert" onclick="openCamp('${c.id}')"><i class="dot" style="background:${cColor(c.clientId)};margin-top:5px"></i><div class="txt"><b>${esc(c.name)}</b> <span class="meta">· ${esc(cl?cl.name:'')}</span><div class="meta" style="margin-top:3px">${esc(top.text)}</div></div><span class="pill ${a.health}">${t('h_'+a.health)}</span></div>`}).join('')
-          :`<div class="empty">${t('alerts_empty')}</div>`}
-        <div class="quick"><button class="btn sm plain" onclick="go('campaigns')">${t('open_camps')}</button></div></div>
-    </div>
-    <div class="grid" style="align-content:start">
-      <div class="card"><h2>📅 ${t('ag_today')} <span class="tag">${I.agenda.length-I.agLeft}/${I.agenda.length}</span></h2>
-        ${I.agenda.length?I.agenda.map(e=>evRow(e,I.td)).join(''):`<div class="empty">${t('ag_empty_today')}</div>`}
-        <div class="quick"><button class="btn sm ghost" onclick="openEvent()">${t('add_ev')}</button><button class="btn sm plain" onclick="go('agenda')">${t('nav_agenda')} →</button></div></div>
-      ${I.newC.length?`<div class="card"><h2>✨ ${t('onboard')}</h2>
-        ${I.newC.map(c=>`<div class="check"><i class="dot" style="background:${c.color}"></i><div class="txt"><b>${esc(c.name)}</b><div class="meta">${esc(c.platform||'')} ${c.notes?'· '+esc(c.notes):''}</div></div>
-        <button class="btn sm ghost" onclick="setStatus('${c.id}','active')">${t('mark_active')}</button></div>`).join('')}</div>`:''}
-      <div class="card"><h2>🗓 ${t('content_today')} <span class="tag">${I.postsToday.filter(p=>p.done).length}/${I.postsToday.length}</span></h2>
-        ${I.postsToday.length?I.postsToday.map(p=>postRow(p)).join(''):`<div class="empty">${t('content_empty')}</div>`}
-        ${I.overdue.length?`<div style="margin-top:12px"><span class="pill over">${t('overdue')}</span></div>${I.overdue.map(p=>postRow(p,true)).join('')}`:''}
-        <div class="quick"><button class="btn sm ghost" onclick="openPost('${I.td}')">${t('plan_post')}</button><button class="btn sm plain" onclick="go('calendar')">${t('open_cal')}</button></div></div>
-      <div class="card"><h2>📝 ${t('mytasks')}</h2>
-        ${I.tasks.length?I.tasks.map(x=>`<div class="check ${x.done?'done':''}"><div class="box ${x.done?'on':''}" onclick="togTask('${x.id}')"></div><div class="txt">${esc(x.text)}${x.clientId&&client(x.clientId)?` <span class="meta">· ${esc(client(x.clientId).name)}</span>`:''}${x.date<I.td?` <span class="pill over">${t('from',fmt(x.date))}</span>`:''}</div><button class="x" onclick="delTask('${x.id}')">✕</button></div>`).join(''):`<div class="empty">${t('tasks_empty')}</div>`}
-        <form class="quick" onsubmit="quickTask(event)"><input id="qt" placeholder="${t('task_ph')}"><button class="btn sm">${t('add')}</button></form></div>
-    </div>
-  </div>`;
+          :`<div class="empty">${t('checkin_empty')}</div>`}</div>`;
 }
 function postRow(p,late){
   const c=client(p.clientId);
@@ -685,7 +683,7 @@ function vAgenda(){
 }
 
 /* ---------- Campaigns view ---------- */
-function vCampaigns(){
+function vCampaigns(I){
   const mk=TODAY().slice(0,7);
   const monthEntries=S.campaigns.flatMap(c=>(c.entries||[]).filter(e=>e.date.startsWith(mk)));
   const ma=agg(monthEntries);
@@ -693,6 +691,7 @@ function vCampaigns(){
   const needAct=S.campaigns.filter(c=>c.status==='active'&&analyze(c).health==='bad').length;
   return `<div class="head"><div><h1>${t('camps_title')}</h1><div class="sub">${t('camps_sub')}</div></div><button class="btn" onclick="openCampForm()">${t('new_camp')}</button></div>
   <div class="stats">${stat(money(ma.spend),t('m_spend'))}${stat(nf(ma.results,0),t('m_results'))}${stat(money(ma.cpr),t('m_cpr'))}${stat(needAct,t('m_action'),needAct?'var(--bad)':'')}</div>
+  ${checkinCard(I)}
   <div class="calbar"><div class="filters">${['active','paused','ended','all'].map(f=>`<button class="chipbtn ${campStatus===f?'on':''}" onclick="campStatus='${f}';render()">${f==='all'?t('f_all'):t('st_'+f)}</button>`).join('')}</div>
    <select style="width:auto;margin-inline-start:auto" onchange="campClient=this.value;render()"><option value="all">${t('all_clients')}</option>${S.clients.map(c=>`<option value="${c.id}" ${campClient===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
   ${list.length?`<div class="cgrid">${list.map(campCard).join('')}</div>`:`<div class="card empty" style="text-align:center;padding:36px">${t('camps_empty')}<br><br><button class="btn" onclick="openCampForm()">${t('new_camp')}</button></div>`}
