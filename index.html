@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1b33">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Marina</title>
+<style>
+  :root{
+    --bg:#f4f1ea; --panel:#ffffff; --ink:#0f1b33; --muted:#6b7389; --line:#e6e0d3;
+    --navy:#0f1b33; --navy2:#1c2f57; --gold:#c9a24a; --gold2:#e6c97f; --gold-soft:#f7efdc;
+    --ok:#1f8a5b; --ok-soft:#e2f4ea; --warn:#c77a1c; --warn-soft:#fcf0de; --bad:#c43d3d; --bad-soft:#fbe6e6;
+    --radius:16px; --shadow:0 1px 2px rgba(15,27,51,.05),0 6px 24px rgba(15,27,51,.07);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+  button,input,select,textarea{font:inherit;color:inherit}
+  .app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+  aside{background:linear-gradient(180deg,#0f1b33,#0b1428);color:#cfd5e3;padding:24px 16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 22px}
+  .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#e6c97f,#b38a32);display:grid;place-items:center;color:#0f1b33;font-weight:800;font-size:19px;box-shadow:0 4px 14px rgba(201,162,74,.35)}
+  .brand b{font-size:21px;color:var(--gold2);letter-spacing:.5px}
+  .brand small{display:block;color:#8b93a9;font-size:11px}
+  .nav{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#cfd5e3}
+  .nav:hover{background:rgba(255,255,255,.06)}
+  .nav.active{background:var(--gold);color:var(--navy);font-weight:700}
+  .nav .ic{width:18px;text-align:center}
+  .nav .count{margin-inline-start:auto;background:var(--gold2);color:var(--navy);font-size:11px;font-weight:800;border-radius:20px;padding:1px 7px}
+  .nav.active .count{background:var(--navy);color:var(--gold2)}
+  .langs{display:flex;gap:6px;margin:14px 8px 0;background:rgba(255,255,255,.06);border-radius:10px;padding:4px}
+  .langs button{flex:1;border:0;background:none;color:#cfd5e3;padding:6px;border-radius:7px;cursor:pointer;font-weight:600}
+  .langs button.on{background:var(--gold);color:var(--navy)}
+  .side-foot{margin-top:auto;font-size:12px;color:#7d859b;padding:8px;line-height:1.5}
+  main{padding:28px 34px 60px;max-width:1320px;width:100%}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  h1{margin:0;font-size:26px}
+  .sub{color:var(--muted);margin-top:4px}
+  h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  h2 .tag{font-size:11px;font-weight:600;color:var(--muted);background:var(--bg);border-radius:20px;padding:2px 8px}
+  .card{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+  .grid{display:grid;gap:18px}
+  .stats{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:18px}
+  .g2{grid-template-columns:1.2fr 1fr}
+  .stat{display:flex;flex-direction:column;gap:4px;border-top:3px solid var(--gold)}
+  .stat .n{font-size:26px;font-weight:700}
+  .stat .l{color:var(--muted);font-size:12.5px}
+  .btn{border:0;border-radius:10px;padding:9px 14px;cursor:pointer;background:var(--navy);color:var(--gold2);font-weight:700}
+  .btn:hover{background:var(--navy2)}
+  .btn.ghost{background:var(--gold-soft);color:var(--navy)}
+  .btn.ghost:hover{background:#f1e4c4}
+  .btn.plain{background:transparent;color:var(--muted);padding:6px 8px}
+  .btn.sm{padding:6px 10px;font-size:12.5px}
+  .btn.danger{background:var(--bad-soft);color:var(--bad)}
+  input,select,textarea{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;width:100%;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px;font-weight:600}
+  .row{display:flex;gap:10px;align-items:center}
+  .empty{color:var(--muted);font-size:13px;padding:10px 0}
+  .check{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px dashed var(--line)}
+  .check:last-child{border-bottom:0}
+  .box{width:22px;height:22px;border-radius:7px;border:2px solid #cdd2dd;display:grid;place-items:center;cursor:pointer;flex-shrink:0;background:#fff;transition:.15s}
+  .box.on{background:var(--navy);border-color:var(--navy)}
+  .box.on::after{content:"✓";color:var(--gold2);font-size:13px;font-weight:900}
+  .check.done .txt{text-decoration:line-through;color:var(--muted)}
+  .txt{flex:1}
+  .meta{font-size:12px;color:var(--muted)}
+  .pill{font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px;white-space:nowrap}
+  .pill.new{background:var(--gold-soft);color:#8a6a1f}
+  .pill.active,.pill.good{background:var(--ok-soft);color:var(--ok)}
+  .pill.paused,.pill.watch{background:var(--warn-soft);color:var(--warn)}
+  .pill.over,.pill.bad{background:var(--bad-soft);color:var(--bad)}
+  .pill.ended,.pill.none{background:#eceef3;color:var(--muted)}
+  .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;display:inline-block}
+  .ci{display:grid;grid-template-columns:1fr 92px 92px;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px dashed var(--line)}
+  .ci:last-child{border-bottom:0}
+  .ci.h{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--line)}
+  .ci .c{display:flex;justify-content:center}
+  .who{display:flex;align-items:center;gap:9px;min-width:0}
+  .who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .client{display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--c)}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .client h3,.camp h3{margin:0;font-size:16px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12.5px}
+  .kv dt{color:var(--muted)} .kv dd{margin:0}
+  .filters{display:flex;gap:6px;flex-wrap:wrap}
+  .chipbtn{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 12px;cursor:pointer;font-size:12.5px}
+  .chipbtn.on{background:var(--navy);color:var(--gold2);border-color:var(--navy)}
+  /* Calendar */
+  .calbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .calbar .m{font-size:18px;font-weight:700;min-width:170px;text-align:center}
+  .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+  .dow{font-size:11px;font-weight:700;color:var(--muted);text-align:center;padding-bottom:2px}
+  .day{background:#fff;border-radius:12px;min-height:112px;padding:8px;display:flex;flex-direction:column;gap:5px;box-shadow:var(--shadow);cursor:pointer;border:2px solid transparent}
+  .day:hover{border-color:var(--gold-soft)}
+  .day.out{opacity:.35}
+  .day.today{border-color:var(--gold)}
+  .day .dn{font-weight:700;font-size:13px;display:flex;justify-content:space-between}
+  .day.today .dn b{background:var(--navy);color:var(--gold2);border-radius:7px;padding:0 6px}
+  .post{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:4px 6px;border-radius:7px;background:color-mix(in srgb,var(--c) 14%,white);border-inline-start:3px solid var(--c);cursor:pointer;line-height:1.25}
+  .post .pb{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--c);flex-shrink:0;display:grid;place-items:center;background:#fff}
+  .post.done .pb{background:var(--c)}
+  .post.done .pb::after{content:"✓";color:#fff;font-size:9px;font-weight:900}
+  .post.done .pt{text-decoration:line-through;opacity:.6}
+  .post.late{background:var(--bad-soft);border-inline-start-color:var(--bad)}
+  .pt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;margin-top:14px;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:6px}
+  /* Campaigns */
+  .camp{display:flex;flex-direction:column;gap:12px;border-top:4px solid var(--c)}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .tiles.wide{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+  .tile{background:var(--bg);border-radius:10px;padding:8px 10px}
+  .tile .v{font-weight:700;font-size:15px;direction:ltr;unicode-bidi:isolate}
+  .tile .k{font-size:11px;color:var(--muted)}
+  .tile.bad .v{color:var(--bad)} .tile.good .v{color:var(--ok)}
+  .ins{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:10px;font-size:13px;line-height:1.5;margin-bottom:8px;background:var(--bg);border-inline-start:4px solid var(--muted)}
+  .ins.bad{background:var(--bad-soft);border-color:var(--bad)}
+  .ins.watch{background:var(--warn-soft);border-color:var(--warn)}
+  .ins.good{background:var(--ok-soft);border-color:var(--ok)}
+  .ins .i{font-size:15px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{padding:8px 6px;text-align:start;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{color:var(--muted);font-weight:700;font-size:11px}
+  td.n{direction:ltr;unicode-bidi:isolate}
+  .tblwrap{overflow-x:auto}
+  .calc{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .calc .out{background:var(--navy);color:var(--gold2);border-radius:10px;padding:10px 12px;margin-top:10px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+  .calc .out span:first-child{color:#cfd5e3;font-weight:600}
+  .spark{width:100%;height:90px;background:var(--bg);border-radius:10px}
+  /* Modal */
+  .ov{position:fixed;inset:0;background:rgba(11,20,40,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .ov.show{display:flex}
+  .modal{background:#fff;border-radius:18px;padding:22px;width:min(540px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);border-top:4px solid var(--gold)}
+  .modal.wide{width:min(900px,100%)}
+  .modal h3{margin:0 0 16px;font-size:18px}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .fgrid .full{grid-column:1/-1}
+  .hint{font-size:12px;color:var(--muted);background:var(--gold-soft);border-radius:10px;padding:8px 12px;margin-bottom:14px}
+  .mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+  .mfoot .start{margin-inline-end:auto}
+  .daypick{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .daypick button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 0;cursor:pointer;font-size:12.5px}
+  .daypick button.on{background:var(--navy);color:var(--gold2);border-color:var(--navy)}
+  .daypick .blank{visibility:hidden}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--navy);color:var(--gold2);padding:10px 18px;border-radius:12px;transition:.25s;z-index:60;font-weight:600}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .quick{display:flex;gap:8px;margin-top:10px}
+  .x{opacity:0;cursor:pointer;color:var(--muted);border:0;background:none;padding:2px 6px}
+  .check:hover .x,tr:hover .x{opacity:1}
+  .banner{background:linear-gradient(120deg,#0b1428,#1c2f57 65%,#2d4374);color:#fff;border-radius:var(--radius);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:18px;border:1px solid rgba(201,162,74,.35)}
+  .banner .big{font-size:22px;font-weight:700;color:var(--gold2)}
+  .banner .ring{width:76px;height:76px;flex-shrink:0}
+  .alert{display:flex;align-items:flex-start;gap:10px;padding:10px 4px;border-bottom:1px dashed var(--line);cursor:pointer}
+  .alert:last-child{border-bottom:0}
+  .day .posts{display:flex;flex-direction:column;gap:5px}
+  .day.sel{border-color:var(--navy)}
+  .lbls{display:none}
+  .mtop{display:none;align-items:center;gap:10px;background:var(--navy);color:var(--gold2);padding:calc(10px + env(safe-area-inset-top)) 14px 10px;position:sticky;top:0;z-index:30;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+  .mtop .logo{width:32px;height:32px;font-size:16px;border-radius:10px}
+  .mtop b{font-size:18px;flex:1}
+  .sync{font-size:11.5px;font-weight:700;color:var(--gold2);margin-bottom:6px}
+  .sync[data-s="err"]{color:#ff9b8f} .sync[data-s="local"]{color:#8b93a9}
+  .mtop .sync{margin:0;font-size:10.5px;max-width:42vw;text-align:end}
+  .mtop .langs{margin:0;padding:3px}
+  .mtop .langs button{padding:4px 10px;font-size:12px}
+  @media (max-width:980px){.g2,.calc{grid-template-columns:1fr}.app{grid-template-columns:200px 1fr}main{padding:22px}}
+  /* ===== Phone layout ===== */
+  @media (max-width:760px){
+    body{font-size:14.5px}
+    .app{display:block}
+    .mtop{display:flex}
+    aside{position:fixed;inset:auto 0 0 0;height:auto;flex-direction:row;padding:6px 4px calc(6px + env(safe-area-inset-bottom));gap:2px;z-index:40;box-shadow:0 -4px 20px rgba(0,0,0,.25)}
+    aside .brand,aside .langs,.side-foot{display:none}
+    .nav{flex:1;flex-direction:column;gap:2px;padding:6px 2px;font-size:10.5px;justify-content:center;text-align:center;position:relative}
+    .nav .ic{font-size:19px;width:auto}
+    .nav .lbl{display:none} .nav .lbls{display:block}
+    .nav .count{position:absolute;top:1px;inset-inline-end:6px;margin:0;font-size:9.5px;padding:0 5px}
+    main{padding:14px 14px calc(92px + env(safe-area-inset-bottom))}
+    h1{font-size:21px}
+    .head{margin-bottom:14px;align-items:flex-start}
+    .head .row{flex-wrap:wrap}
+    .banner{padding:14px 16px;margin-bottom:14px}.banner .big{font-size:17px}.banner .ring{width:60px;height:60px}
+    .stats{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+    .stat .n{font-size:21px}
+    .stats .stat:last-child:nth-child(odd){grid-column:1/-1}
+    .grid{gap:14px}
+    .card{padding:14px}
+    .fgrid{grid-template-columns:1fr}
+    .ci{grid-template-columns:1fr 60px 76px}
+    .cgrid{grid-template-columns:1fr}
+    .cal{gap:3px}
+    .dow{font-size:10.5px}
+    .day{min-height:54px;padding:4px;border-radius:8px;gap:3px}
+    .day .dn{font-size:12px}
+    .day .dn .meta{display:none}
+    .day .posts{flex-direction:row;flex-wrap:wrap;gap:3px}
+    .post{width:8px;height:8px;padding:0;border-radius:50%;background:var(--c);border:0}
+    .post .pb,.post .pt{display:none}
+    .post.done{opacity:.35}
+    .post.late{background:var(--bad)}
+    .calbar .m{min-width:0;flex:1;font-size:16px}
+    .calbar select{width:100%!important;margin:0!important}
+    .ov{align-items:flex-end;padding:0}
+    .modal,.modal.wide{width:100%;border-radius:18px 18px 0 0;max-height:90vh;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+    input,select,textarea{font-size:16px}
+    .x{opacity:1}
+    .toast{bottom:calc(84px + env(safe-area-inset-bottom));max-width:90vw;text-align:center}
+    .tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .tile .v{font-size:13.5px}
+    .daypick button{padding:9px 0}
+    .filters{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;max-width:100%}
+    .chipbtn{white-space:nowrap}
+    .calc .out{font-size:13px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="mtop"><div class="logo">M</div><b>Marina</b><span class="sync"></span><div class="langs"><button data-lang="en">EN</button><button data-lang="ar">ع</button></div></header>
+  <aside>
+    <div class="brand"><div class="logo">M</div><div><b>Marina</b><small id="tagline"></small></div></div>
+    <button class="nav" data-view="today"><span class="ic">☀</span><span class="lbl" data-t="nav_today"></span><span class="lbls" data-t="ns_today"></span><span class="count" id="navToday"></span></button>
+    <button class="nav" data-view="agenda"><span class="ic">📅</span><span class="lbl" data-t="nav_agenda"></span><span class="lbls" data-t="ns_agenda"></span><span class="count" id="navAgenda"></span></button>
+    <button class="nav" data-view="campaigns"><span class="ic">📈</span><span class="lbl" data-t="nav_camps"></span><span class="lbls" data-t="ns_camps"></span><span class="count" id="navCamps"></span></button>
+    <button class="nav" data-view="clients"><span class="ic">👥</span><span class="lbl" data-t="nav_clients"></span><span class="lbls" data-t="ns_clients"></span></button>
+    <button class="nav" data-view="calendar"><span class="ic">🗓</span><span class="lbl" data-t="nav_cal"></span><span class="lbls" data-t="ns_cal"></span></button>
+    <button class="nav" data-view="settings"><span class="ic">⚙</span><span class="lbl" data-t="nav_settings"></span><span class="lbls" data-t="ns_settings"></span></button>
+    <div class="langs"><button data-lang="en">English</button><button data-lang="ar">عربي</button></div>
+    <div class="side-foot"><div class="sync"></div><div id="sideNote"></div></div>
+  </aside>
+  <main id="main"></main>
+</div>
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= Translations ================= */
+const L = {
+en:{
+ sync_cloud:'☁ Synced to your account', sync_saving:'⟳ Saving…', sync_local:'Saved on this device', sync_err:'⚠ Not synced — check your internet',
+ side_cloud:'Your data syncs to your Claude account. Open the same link on your phone and laptop.', export_fail:'Could not save the file here — try from a computer.', restore_btn:'Restore',
+ tagline:'Media buying workspace', ns_today:'Today', ns_agenda:'Agenda', ns_camps:'Campaigns', ns_clients:'Clients', ns_cal:'Calendar', ns_settings:'Settings', nav_today:'Today', nav_camps:'Campaigns', nav_clients:'Clients', nav_cal:'Content Calendar', nav_settings:'Routine & Settings',
+ side_foot:'Your data is saved in this browser. Back it up from Settings.',
+ gm:'Good morning', ga:'Good afternoon', ge:'Good evening', hello:'{0}, Marina 👋',
+ msg_start:'Add your clients to get started ✨', msg_done:'Everything is done for today. Amazing work! 🎉', msg_left:'You have {0} things left today', checks_done:'{0} of {1} checks completed',
+ btn_task:'+ Task', btn_client:'+ Add client',
+ s_active:'Active clients', s_new:'New clients to onboard', s_posts:'Posts planned today', s_overdue:'Overdue posts', s_alerts:'Campaigns needing attention',
+ routine:'Daily routine', routine_empty:'No routine items — add some in Settings.',
+ checkin:'Accounts & campaigns check-in', tag_active:'active clients', col_client:'Client', col_acc:'Account', col_cmp:'Campaigns', checkin_empty:'No active clients yet. Add a client and set them to Active.',
+ onboard:'New clients to onboard', mark_active:'Mark active',
+ content_today:"Today's content", content_empty:'Nothing scheduled to post today.', overdue:'Overdue', plan_post:'+ Plan a post', open_cal:'Open calendar →',
+ mytasks:'My tasks', tasks_empty:'No extra tasks for today.', from:'from {0}', task_ph:'Add a task for today…', add:'Add',
+ alerts_title:'Campaign alerts', alerts_empty:'No alerts — your campaigns look healthy.', open_camps:'Open campaigns →',
+ clients_title:'Clients', clients_sub:'{0} total · {1} active · {2} new · {3} paused', f_all:'All',
+ st_new:'New', st_active:'Active', st_paused:'Paused', st_ended:'Ended',
+ k_account:'Ad account', k_budget:'Budget', k_contact:'Contact', k_start:'Start', k_content:'Content', k_camps:'Campaigns',
+ upcoming:'{0} upcoming', overdue_n:'{0} overdue', camps_n:'{0} running', plan_posts:'Plan posts', edit:'Edit', clients_empty:'No clients here yet.', first_client:'+ Add your first client',
+ cal_title:'Content Calendar', cal_sub:'{0} of {1} posts published this month · tick the box when a post goes live', monthly_plan:'⚡ Monthly plan', add_post:'+ Add post', today_btn:'Today', all_clients:'All clients', overdue_legend:'Overdue (not posted)',
+ set_title:'Routine & Settings', set_sub:'Your daily routine resets every morning automatically.', routine_items:'Daily routine items', remove:'Remove', routine_ph:'e.g. Check pixel & conversion events',
+ remind:'Reminders', remind_desc:'A desktop notification with your daily summary while Marina is open.', status:'Status', remind_time:'Daily reminder time', enable_notif:'Enable notifications',
+ backup:'Backup', backup_desc:'Everything is stored in this browser. Export a backup file regularly, or to move to another device.', export:'Export backup', import:'Import backup',
+ prefs:'Preferences', lang:'Language', currency:'Currency',
+ add_client_t:'Add new client', edit_client_t:'Edit client', f_name:'Client / brand name *', f_platform:'Platforms', f_platform_ph:'Facebook, Instagram, TikTok', f_status:'Status',
+ f_account:'Ad account', f_account_ph:'Account name / ID', f_budget:'Monthly budget', f_budget_ph:'e.g. 15,000', f_contact:'Contact', f_contact_ph:'Name / phone', f_start:'Start date', f_notes:'Notes', f_notes_ph:'Goals, offers, anything to remember',
+ del:'Delete', cancel:'Cancel', save:'Save', add_client_btn:'Add client', confirm_del_client:'Delete this client with all their posts and campaigns?',
+ new_task_t:'New task', f_task:'Task *', f_task_ph:'e.g. Send weekly report', f_date:'Date', f_client_opt:'Client (optional)', add_task:'Add task',
+ plan_post_t:'Plan a post', edit_post_t:'Edit post', f_client:'Client *', f_type:'Type', planned:'Planned', posted:'Posted ✓', f_topic:'Topic / caption idea', f_topic_ph:'e.g. Black Friday offer', add_to_cal:'Add to calendar',
+ plan_t:'⚡ Monthly content plan', f_month:'Month', f_topic_opt:'Topic (optional)', f_same:'Same note for all', quick:'Quick pick', qp_odd:'Every other day', qp_3:'Every 3 days', qp_a:'Sun · Tue · Thu', qp_b:'Sat · Mon · Wed', clear:'Clear', pick_days:'Click the posting days', selected:'({0} selected)', pick_one:'Pick at least one day', planned_n:'{0} posts planned ✨',
+ saved:'Saved', client_added:'Client added ✨', client_updated:'Client updated', task_added:'Task added', saved_cal:'Saved to calendar', posted_t:'Posted ✓', client_now:'Client is now {0}', add_client_first:'Add a client first',
+ storage_blocked:'Storage is blocked here — open the file in Chrome/Edge to save data', restored:'Backup restored', bad_backup:'That file is not a Marina backup.', confirm_restore:'Replace current data with this backup?', no_notif:'This browser does not support notifications.',
+ n_title:'Marina · Your day', n_check:'check {0} accounts & campaigns', n_posts:'{0} post(s) to publish', n_over:'{0} overdue', n_new:'{0} new client(s)', n_alerts:'{0} campaign alert(s)', n_today:'Today: ', n_clear:'All clear for today ✨',
+ ty_post:'Post', ty_reel:'Reel', ty_story:'Story', ty_carousel:'Carousel', ty_adcreative:'Ad creative', ty_video:'Video',
+ rt1:'Review ad accounts — spend, billing & limits', rt2:'Check running campaigns — CPR, CTR, CPM, frequency', rt3:'Reply to page inboxes & comments', rt4:'Check new leads / new client requests', rt5:'Send daily update to clients who need it',
+ camps_title:'Campaigns', camps_sub:'Enter your numbers — Marina calculates the metrics and tells you what to do.', new_camp:'+ New campaign', camps_empty:'No campaigns yet. Create one and add its numbers.',
+ m_spend:'Spend this month', m_results:'Results this month', m_cpr:'Avg. cost / result', m_action:'Need action',
+ spend:'Spend', results:'Results', cpr:'Cost / result', ctr:'CTR', cpc:'CPC', cpm:'CPM', roas:'ROAS', freq:'Frequency', cvr:'Conv. rate', impr:'Impressions', reach:'Reach', clicks:'Clicks', revenue:'Revenue (sales)',
+ last_upd:'Updated {0}', never_upd:'No numbers yet', add_nums:'+ Add numbers', details:'Details',
+ h_good:'Healthy', h_watch:'Watch', h_bad:'Needs action', h_none:'No data',
+ new_camp_t:'New campaign', edit_camp_t:'Edit campaign', f_camp_name:'Campaign name *', f_camp_ph:'e.g. Messages – Winter offer', f_objective:'Objective',
+ obj_messages:'Messages', obj_leads:'Leads', obj_sales:'Sales', obj_traffic:'Traffic', obj_engagement:'Engagement', obj_awareness:'Awareness',
+ f_daily:'Daily budget', f_target_cpr:'Target cost / result', f_target_roas:'Target ROAS (sales only)', f_platform1:'Platform', create_camp:'Create campaign', camp_saved:'Campaign saved', confirm_del_camp:'Delete this campaign and its numbers?',
+ nums_t:'Add numbers — {0}', nums_hint:'Copy the numbers from Ads Manager for one day (or a period total). Saving the same date again replaces the old numbers.', save_nums:'Save numbers', nums_saved:'Numbers saved — here is the analysis',
+ period:'Period', p_last:'Last entry', p_7:'Last 7 days', p_all:'All time', insights:'What Marina says', history:'Numbers history', trend:'Cost / result trend', target:'target', no_entries:'No numbers yet.',
+ i_no_data:'No numbers yet — add the first numbers to get an analysis.',
+ i_cpr_bad:'Cost per result ({0}) is {1}% above your target ({2}). Review the audience & creatives, or move budget to the best ad set.',
+ i_cpr_good:'Cost per result ({0}) is under your target ({1}). Good moment to scale the budget by ~20%.',
+ i_cpr_near:'Cost per result ({0}) is a little above target ({1}) — keep watching.',
+ i_ctr_low:'CTR is {0}% (low). The creative/hook isn\'t grabbing attention — test a new creative or a stronger first 3 seconds.',
+ i_ctr_good:'CTR is {0}% — strong creative 👌',
+ i_freq_high:'Frequency is {0} — the audience is getting tired. Refresh creatives or widen the audience.',
+ i_cvr_low:'People click but don\'t convert ({0}% conversion). Check the landing page, the offer, or how fast messages are answered.',
+ i_roas_loss:'ROAS is {0} — you are spending more than you make. Pause weak ads or fix the offer.',
+ i_roas_low:'ROAS {0} is below your target ({1}).', i_roas_good:'ROAS {0} beats your target ({1}) 🎯',
+ i_cpm_up:'CPM rose {0}% vs the previous period — more competition or the audience is too narrow.',
+ i_cpr_up:'Cost per result rose {0}% vs the previous period — watch it closely.', i_cpr_down:'Cost per result dropped {0}% vs the previous period 👏',
+ i_under:'Spent only {0}% of the daily budget — under-delivering (small audience, low bid or spending limit).', i_over:'Spent {0}% of the daily budget — check for overspend.',
+ i_stale:'Numbers not updated for {0} days — add the latest numbers.',
+ calc_title:'Quick calculator', calc_a:'Budget → results', calc_b:'Profit → max cost', calc_budget:'Budget', calc_cpr:'Expected cost / result', calc_results:'Expected results', calc_need:'Results you want', calc_needbudget:'Budget needed',
+ calc_price:'Product price', calc_margin:'Profit margin %', calc_maxcpa:'Max cost per sale (break-even)', calc_beroas:'Break-even ROAS',
+ nav_agenda:'My Agenda', ag_title:'My Agenda', ag_sub:'Service, prayer, meetings, reading, work and appointments — all in one place.', add_ev:'+ Add',
+ ag_today:"Today's agenda", ag_empty_today:'Nothing on your agenda today.', ag_week:'Next 7 days', ag_week_empty:'Nothing coming up.',
+ ag_all:"Everything I'm responsible for", ag_all_empty:'Add your service, prayer times, meetings and reading time.', ag_quick:'Quick add',
+ cat_spiritual:'Spiritual', cat_work:'Work', cat_personal:'Appointments',
+ k_service:'Service', k_prayer:'Prayer', k_church_meeting:'Church meeting', k_reading:'Reading', k_meeting:'Work meeting', k_content:'Content', k_ads:'Ads', k_worktask:'Work task', k_appointment:'Appointment', k_other:'Other',
+ ev_new:'New item', ev_edit:'Edit item', f_ev_title:'Title *', f_ev_title_ph:'e.g. Sunday school service', f_kind:'Category', f_time:'Time', f_repeat:'Repeat',
+ r_none:'One time', r_daily:'Every day', r_weekly:'Every week', r_monthly:'Every month', f_wdays:'On days', f_loc:'Place / link', f_todos:'What I need to do (one per line)', f_todos_ph:'Prepare the lesson\nPrint the papers\nCall the kids',
+ ev_saved:'Saved ✨', confirm_del_ev:'Delete this item?', next_on:'Next: {0}', n_soon:'{0} at {1}', n_ag:'{0} on your agenda',
+ rc_title:'Business ROAS calculator — what ROAS means success?', rc_sub:'Enter the business numbers for one order. Marina calculates the break-even ROAS and the ROAS you need to make the profit you want.',
+ rc_price:'Average order value (selling price)', rc_cost:'Product cost', rc_ship:'Shipping & packaging per order', rc_fees:'Fees & returns % (payment, COD, returns)', rc_margin:'Net profit you want (% of price)', rc_actual:'Current campaign ROAS (optional)',
+ rc_profit:'Profit per order before ads', rc_be:'Break-even ROAS', rc_be_d:'below this you lose money', rc_becpa:'Max cost per purchase (break-even)', rc_target:'Successful ROAS (your target)', rc_target_d:'gives you {0}% net profit', rc_tcpa:'Target cost per purchase', rc_exc:'Excellent ROAS — scale it',
+ z_loss:'Losing', z_be:'Break-even zone', z_ok:'Successful', z_exc:'Excellent',
+ rc_noprofit:'This product has no profit even before ads ({0} per order). Raise the price, lower costs, or sell bundles.', rc_toohigh:'That profit % is too high — the most you can make before ads is {0}%.',
+ rc_v_loss:'At ROAS {0} you LOSE {1} per order ({2}%). Stop or fix the campaign.', rc_v_be:'At ROAS {0} you make {1} per order ({2}% net) — positive, but under your target.',
+ rc_v_ok:'At ROAS {0} you make {1} per order ({2}% net) — successful campaign ✅', rc_v_exc:'At ROAS {0} you make {1} per order ({2}% net) — excellent, scale the budget 🚀',
+ rc_per1000:'Every 1,000 spent on ads → {0} net profit', rc_apply:'Use as the target for campaign:', rc_apply_btn:'Apply', rc_applied:'Target ROAS & cost per purchase saved to the campaign',
+ rc_formula:'Break-even ROAS = price ÷ profit per order. Successful ROAS = price ÷ (profit per order − the profit you want).',
+ rc_fixed:'Monthly fixed costs (salaries, rent, agency fee)', rc_orders:'Expected orders per month', rc_close:'Messages / leads that become a sale %',
+ rc_fixed_po:'Fixed costs per order', rc_fixed_d:'{0} ÷ {1} orders', rc_msg_title:'💬 For messages / leads campaigns', rc_msg_t:'Target cost per message / lead', rc_msg_be:'Max cost per message / lead (break-even)', rc_msg_d:'closing {0}% of messages',
+ rc_msg_formula:'Cost per message = cost per sale × closing %. Example: 180 × 10% = 18.'
+},
+ar:{
+ sync_cloud:'☁ متزامن مع حسابك', sync_saving:'⟳ بيحفظ…', sync_local:'محفوظ على الجهاز ده', sync_err:'⚠ متزامنش — اتأكدي من النت',
+ side_cloud:'بياناتك بتتزامن مع حساب Claude بتاعك. افتحي نفس اللينك على الموبايل واللاب توب.', export_fail:'مقدرتش أحفظ الملف هنا — جربي من الكمبيوتر.', restore_btn:'استرجاع',
+ tagline:'مساحة شغل الميديا باينج', ns_today:'النهاردة', ns_agenda:'مواعيدي', ns_camps:'الكامبينز', ns_clients:'العملاء', ns_cal:'الكالندر', ns_settings:'الإعدادات', nav_today:'النهاردة', nav_camps:'الكامبينز', nav_clients:'العملاء', nav_cal:'كالندر المحتوى', nav_settings:'الروتين والإعدادات',
+ side_foot:'بياناتك محفوظة في المتصفح ده. خدي نسخة احتياطية من الإعدادات.',
+ gm:'صباح الخير', ga:'مساء الخير', ge:'مساء الخير', hello:'{0} يا مارينا 👋',
+ msg_start:'ضيفي عملاءك علشان نبدأ ✨', msg_done:'خلصتي كل حاجة النهاردة. شغل عظيم! 🎉', msg_left:'فاضل لك {0} حاجات النهاردة', checks_done:'خلصتي {0} من {1}',
+ btn_task:'+ مهمة', btn_client:'+ إضافة عميل',
+ s_active:'عملاء نشطين', s_new:'عملاء جداد', s_posts:'بوستات النهاردة', s_overdue:'بوستات متأخرة', s_alerts:'كامبينز محتاجة متابعة',
+ routine:'الروتين اليومي', routine_empty:'مفيش روتين — ضيفي من الإعدادات.',
+ checkin:'مراجعة الأكونتات والكامبينز', tag_active:'العملاء النشطين', col_client:'العميل', col_acc:'الأكونت', col_cmp:'الكامبينز', checkin_empty:'مفيش عملاء نشطين لسه. ضيفي عميل وخليه نشط.',
+ onboard:'عملاء جداد محتاجين متابعة', mark_active:'تفعيل',
+ content_today:'محتوى النهاردة', content_empty:'مفيش بوستات متخططة النهاردة.', overdue:'متأخر', plan_post:'+ خططي بوست', open_cal:'افتحي الكالندر ←',
+ mytasks:'مهامي', tasks_empty:'مفيش مهام زيادة النهاردة.', from:'من {0}', task_ph:'ضيفي مهمة للنهاردة…', add:'إضافة',
+ alerts_title:'تنبيهات الكامبينز', alerts_empty:'مفيش تنبيهات — الكامبينز تمام.', open_camps:'افتحي الكامبينز ←',
+ clients_title:'العملاء', clients_sub:'{0} عميل · {1} نشط · {2} جديد · {3} متوقف', f_all:'الكل',
+ st_new:'جديد', st_active:'نشط', st_paused:'متوقف', st_ended:'منتهي',
+ k_account:'الأد أكونت', k_budget:'البادجت', k_contact:'التواصل', k_start:'البداية', k_content:'المحتوى', k_camps:'الكامبينز',
+ upcoming:'{0} جاي', overdue_n:'{0} متأخر', camps_n:'{0} شغالة', plan_posts:'خطة بوستات', edit:'تعديل', clients_empty:'مفيش عملاء هنا لسه.', first_client:'+ ضيفي أول عميل',
+ cal_title:'كالندر المحتوى', cal_sub:'نزل {0} من {1} بوست الشهر ده · علّمي على البوست أول ما ينزل', monthly_plan:'⚡ خطة الشهر', add_post:'+ إضافة بوست', today_btn:'النهاردة', all_clients:'كل العملاء', overdue_legend:'متأخر (منزلش)',
+ set_title:'الروتين والإعدادات', set_sub:'الروتين اليومي بيتصفّر لوحده كل يوم الصبح.', routine_items:'مهام الروتين اليومي', remove:'حذف', routine_ph:'مثلاً: مراجعة البيكسل والإيفنتس',
+ remind:'التذكير', remind_desc:'إشعار على الكمبيوتر بملخص يومك طول ما مارينا مفتوحة.', status:'الحالة', remind_time:'ميعاد التذكير اليومي', enable_notif:'تفعيل الإشعارات',
+ backup:'نسخة احتياطية', backup_desc:'كل حاجة متخزنة في المتصفح ده. خدي نسخة احتياطية كل فترة، أو لو هتنقلي لجهاز تاني.', export:'تصدير نسخة', import:'استرجاع نسخة',
+ prefs:'التفضيلات', lang:'اللغة', currency:'العملة',
+ add_client_t:'إضافة عميل جديد', edit_client_t:'تعديل العميل', f_name:'اسم العميل / البراند *', f_platform:'المنصات', f_platform_ph:'فيسبوك، إنستجرام، تيك توك', f_status:'الحالة',
+ f_account:'الأد أكونت', f_account_ph:'اسم أو رقم الأكونت', f_budget:'البادجت الشهري', f_budget_ph:'مثلاً 15,000', f_contact:'التواصل', f_contact_ph:'الاسم / الموبايل', f_start:'تاريخ البداية', f_notes:'ملاحظات', f_notes_ph:'الأهداف، العروض، أي حاجة عايزة تفتكريها',
+ del:'حذف', cancel:'إلغاء', save:'حفظ', add_client_btn:'إضافة العميل', confirm_del_client:'تمسحي العميل ده بكل بوستاته وكامبيناته؟',
+ new_task_t:'مهمة جديدة', f_task:'المهمة *', f_task_ph:'مثلاً: إرسال التقرير الأسبوعي', f_date:'التاريخ', f_client_opt:'العميل (اختياري)', add_task:'إضافة المهمة',
+ plan_post_t:'خططي بوست', edit_post_t:'تعديل البوست', f_client:'العميل *', f_type:'النوع', planned:'متخطط', posted:'نزل ✓', f_topic:'الفكرة / الكابشن', f_topic_ph:'مثلاً: عرض البلاك فرايداي', add_to_cal:'إضافة للكالندر',
+ plan_t:'⚡ خطة المحتوى للشهر', f_month:'الشهر', f_topic_opt:'الفكرة (اختياري)', f_same:'نفس الملاحظة للكل', quick:'اختيار سريع', qp_odd:'يوم آه ويوم لأ', qp_3:'كل 3 أيام', qp_a:'حد · تلات · خميس', qp_b:'سبت · اتنين · أربع', clear:'مسح', pick_days:'اختاري أيام النشر', selected:'({0} يوم)', pick_one:'اختاري يوم واحد على الأقل', planned_n:'اتخطط {0} بوست ✨',
+ saved:'اتحفظ', client_added:'العميل اتضاف ✨', client_updated:'العميل اتعدل', task_added:'المهمة اتضافت', saved_cal:'اتحفظ في الكالندر', posted_t:'نزل ✓', client_now:'العميل بقى {0}', add_client_first:'ضيفي عميل الأول',
+ storage_blocked:'الحفظ مقفول هنا — افتحي الملف في Chrome أو Edge', restored:'النسخة اترجعت', bad_backup:'الملف ده مش نسخة من مارينا.', confirm_restore:'تستبدلي البيانات الحالية بالنسخة دي؟', no_notif:'المتصفح ده مش بيدعم الإشعارات.',
+ n_title:'مارينا · يومك', n_check:'راجعي {0} أكونت وكامبين', n_posts:'{0} بوست ينزل', n_over:'{0} متأخر', n_new:'{0} عميل جديد', n_alerts:'{0} تنبيه كامبين', n_today:'النهاردة: ', n_clear:'مفيش حاجة النهاردة ✨',
+ ty_post:'بوست', ty_reel:'ريل', ty_story:'ستوري', ty_carousel:'كاروسيل', ty_adcreative:'كرييتيف إعلان', ty_video:'فيديو',
+ rt1:'مراجعة الأد أكونتس — الصرف والفواتير والليمت', rt2:'متابعة الكامبينز الشغالة — CPR, CTR, CPM, التكرار', rt3:'الرد على الإنبوكس والكومنتات', rt4:'مراجعة الليدز وطلبات العملاء الجداد', rt5:'إرسال التحديث اليومي للعملاء اللي محتاجينه',
+ camps_title:'الكامبينز', camps_sub:'دخّلي أرقامك — ومارينا هتحسب المؤشرات وتقولك تعملي إيه.', new_camp:'+ كامبين جديدة', camps_empty:'مفيش كامبينز لسه. اعملي واحدة وضيفي أرقامها.',
+ m_spend:'الصرف الشهر ده', m_results:'النتايج الشهر ده', m_cpr:'متوسط تكلفة النتيجة', m_action:'محتاجة تدخل',
+ spend:'الصرف', results:'النتايج', cpr:'تكلفة النتيجة', ctr:'CTR', cpc:'CPC', cpm:'CPM', roas:'ROAS', freq:'التكرار', cvr:'معدل التحويل', impr:'مرات الظهور', reach:'الوصول', clicks:'الكليكات', revenue:'الإيراد (مبيعات)',
+ last_upd:'آخر تحديث {0}', never_upd:'لسه مفيش أرقام', add_nums:'+ إضافة أرقام', details:'التفاصيل',
+ h_good:'كويسة', h_watch:'تحت المراقبة', h_bad:'محتاجة تدخل', h_none:'مفيش داتا',
+ new_camp_t:'كامبين جديدة', edit_camp_t:'تعديل الكامبين', f_camp_name:'اسم الكامبين *', f_camp_ph:'مثلاً: رسائل – عرض الشتا', f_objective:'الهدف',
+ obj_messages:'رسائل', obj_leads:'ليدز', obj_sales:'مبيعات', obj_traffic:'زيارات', obj_engagement:'تفاعل', obj_awareness:'انتشار',
+ f_daily:'البادجت اليومي', f_target_cpr:'تارجت تكلفة النتيجة', f_target_roas:'تارجت الـROAS (للمبيعات بس)', f_platform1:'المنصة', create_camp:'إنشاء الكامبين', camp_saved:'الكامبين اتحفظت', confirm_del_camp:'تمسحي الكامبين دي بأرقامها؟',
+ nums_t:'إضافة أرقام — {0}', nums_hint:'انقلي الأرقام من الأدز مانجر ليوم واحد (أو إجمالي فترة). لو حفظتي نفس التاريخ تاني، الأرقام القديمة هتتبدل.', save_nums:'حفظ الأرقام', nums_saved:'الأرقام اتحفظت — ودي التحليل',
+ period:'الفترة', p_last:'آخر تحديث', p_7:'آخر 7 أيام', p_all:'الكل', insights:'مارينا بتقولك', history:'سجل الأرقام', trend:'اتجاه تكلفة النتيجة', target:'التارجت', no_entries:'لسه مفيش أرقام.',
+ i_no_data:'لسه مفيش أرقام — ضيفي أول أرقام علشان يطلع التحليل.',
+ i_cpr_bad:'تكلفة النتيجة ({0}) أعلى من التارجت ({2}) بنسبة {1}%. راجعي الأوديانس والكرييتيف، أو انقلي البادجت لأحسن أد سِت.',
+ i_cpr_good:'تكلفة النتيجة ({0}) أقل من التارجت ({1}). وقت كويس تزودي البادجت حوالي 20%.',
+ i_cpr_near:'تكلفة النتيجة ({0}) أعلى من التارجت ({1}) بشوية — كمّلي متابعة.',
+ i_ctr_low:'الـCTR ‏{0}% (ضعيف). الكرييتيف أو الهوك مش جاذب — جربي كرييتيف جديد أو أول 3 ثواني أقوى.',
+ i_ctr_good:'الـCTR ‏{0}% — الكرييتيف قوي 👌',
+ i_freq_high:'التكرار {0} — الأوديانس بدأ يزهق. غيّري الكرييتيف أو وسّعي الأوديانس.',
+ i_cvr_low:'الناس بتدوس بس مش بتكمّل (معدل تحويل {0}%). راجعي اللاندينج بيدج أو العرض أو سرعة الرد على الرسائل.',
+ i_roas_loss:'الـROAS ‏{0} — بتصرفي أكتر من اللي راجع. وقّفي الإعلانات الضعيفة أو عدّلي العرض.',
+ i_roas_low:'الـROAS ‏{0} أقل من التارجت ({1}).', i_roas_good:'الـROAS ‏{0} أحسن من التارجت ({1}) 🎯',
+ i_cpm_up:'الـCPM زاد {0}% عن الفترة اللي قبلها — المنافسة زادت أو الأوديانس ضيق.',
+ i_cpr_up:'تكلفة النتيجة زادت {0}% عن الفترة اللي قبلها — تابعيها كويس.', i_cpr_down:'تكلفة النتيجة قلّت {0}% عن الفترة اللي قبلها 👏',
+ i_under:'اتصرف {0}% بس من البادجت اليومي — الكامبين مش بتصرف كويس (أوديانس صغير أو بيد قليل أو ليمت).', i_over:'اتصرف {0}% من البادجت اليومي — راجعي لو فيه صرف زيادة.',
+ i_stale:'الأرقام متحدثتش من {0} يوم — ضيفي آخر أرقام.',
+ calc_title:'حاسبة سريعة', calc_a:'البادجت ← النتايج', calc_b:'الربح ← أقصى تكلفة', calc_budget:'البادجت', calc_cpr:'تكلفة النتيجة المتوقعة', calc_results:'النتايج المتوقعة', calc_need:'عدد النتايج اللي عايزاها', calc_needbudget:'البادجت المطلوب',
+ calc_price:'سعر المنتج', calc_margin:'هامش الربح %', calc_maxcpa:'أقصى تكلفة للبيعة (نقطة التعادل)', calc_beroas:'ROAS نقطة التعادل',
+ nav_agenda:'مواعيدي وخدمتي', ag_title:'مواعيدي وخدمتي', ag_sub:'الخدمة والصلاة والاجتماعات والقراية والشغل والمواعيد — كله في مكان واحد.', add_ev:'+ إضافة',
+ ag_today:'مواعيد النهاردة', ag_empty_today:'مفيش مواعيد النهاردة.', ag_week:'الـ7 أيام الجايين', ag_week_empty:'مفيش حاجة جاية.',
+ ag_all:'كل مسؤولياتي', ag_all_empty:'ضيفي خدمتك ومواعيد الصلاة والاجتماعات ووقت القراية.', ag_quick:'إضافة سريعة',
+ cat_spiritual:'روحي', cat_work:'شغل', cat_personal:'مواعيد',
+ k_service:'خدمة', k_prayer:'صلاة', k_church_meeting:'اجتماع', k_reading:'قراية', k_meeting:'ميتنج شغل', k_content:'كونتنت', k_ads:'إعلانات', k_worktask:'تاسك شغل', k_appointment:'معاد', k_other:'حاجة تانية',
+ ev_new:'إضافة جديدة', ev_edit:'تعديل', f_ev_title:'الاسم *', f_ev_title_ph:'مثلاً: خدمة مدارس الأحد', f_kind:'النوع', f_time:'الساعة', f_repeat:'التكرار',
+ r_none:'مرة واحدة', r_daily:'كل يوم', r_weekly:'كل أسبوع', r_monthly:'كل شهر', f_wdays:'في أيام', f_loc:'المكان / اللينك', f_todos:'المطلوب مني (كل حاجة في سطر)', f_todos_ph:'أحضّر الدرس\nأطبع الورق\nأكلم الأولاد',
+ ev_saved:'اتحفظ ✨', confirm_del_ev:'تمسحي دي؟', next_on:'الجاي: {0}', n_soon:'{0} الساعة {1}', n_ag:'{0} مواعيد',
+ rc_title:'حاسبة الـROAS للبيزنس — من كام يبقى ناجح؟', rc_sub:'دخّلي أرقام البيزنس للأوردر الواحد، ومارينا هتحسبلك ROAS نقطة التعادل والـROAS اللي لازم توصليله علشان تكسبي الربح اللي عايزاه.',
+ rc_price:'متوسط قيمة الأوردر (سعر البيع)', rc_cost:'تكلفة المنتج', rc_ship:'الشحن والتغليف للأوردر', rc_fees:'رسوم ومرتجعات % (دفع، تحصيل، مرتجع)', rc_margin:'صافي الربح اللي عايزاه (% من السعر)', rc_actual:'الـROAS الحالي للكامبين (اختياري)',
+ rc_profit:'ربح الأوردر قبل الإعلانات', rc_be:'ROAS نقطة التعادل', rc_be_d:'أقل من كده انتي خسرانة', rc_becpa:'أقصى تكلفة للبيعة (تعادل)', rc_target:'الـROAS الناجح (التارجت بتاعك)', rc_target_d:'بيديكي {0}% صافي ربح', rc_tcpa:'تكلفة البيعة المستهدفة', rc_exc:'ROAS ممتاز — كبّري البادجت',
+ z_loss:'خسارة', z_be:'منطقة التعادل', z_ok:'ناجح', z_exc:'ممتاز',
+ rc_noprofit:'المنتج ده مفيهوش ربح حتى قبل الإعلانات ({0} للأوردر). زودي السعر أو قللي التكاليف أو اعملي باكدجات.', rc_toohigh:'نسبة الربح دي عالية أوي — أقصى ربح ممكن قبل الإعلانات {0}%.',
+ rc_v_loss:'على ROAS {0} انتي بتخسري {1} في كل أوردر ({2}%). وقّفي الكامبين أو عدّليها.', rc_v_be:'على ROAS {0} بتكسبي {1} في الأوردر ({2}% صافي) — كسبانة بس أقل من التارجت.',
+ rc_v_ok:'على ROAS {0} بتكسبي {1} في الأوردر ({2}% صافي) — كامبين ناجحة ✅', rc_v_exc:'على ROAS {0} بتكسبي {1} في الأوردر ({2}% صافي) — ممتازة، زودي البادجت 🚀',
+ rc_per1000:'كل 1,000 بتتصرف على الإعلانات ← {0} صافي ربح', rc_apply:'استخدميه كتارجت للكامبين:', rc_apply_btn:'تطبيق', rc_applied:'التارجت (ROAS وتكلفة البيعة) اتحفظ في الكامبين',
+ rc_formula:'ROAS التعادل = السعر ÷ ربح الأوردر. الـROAS الناجح = السعر ÷ (ربح الأوردر − الربح اللي عايزاه).',
+ rc_fixed:'المصاريف الثابتة في الشهر (مرتبات، إيجار، أتعاب الإيجنسي)', rc_orders:'عدد الأوردرات المتوقع في الشهر', rc_close:'نسبة الرسائل / الليدز اللي بتتحول لبيعة %',
+ rc_fixed_po:'نصيب الأوردر من المصاريف الثابتة', rc_fixed_d:'{0} ÷ {1} أوردر', rc_msg_title:'💬 لكامبينز الرسائل / الليدز', rc_msg_t:'تارجت تكلفة الرسالة / الليد', rc_msg_be:'أقصى تكلفة للرسالة / الليد (تعادل)', rc_msg_d:'بتقفلي {0}% من الرسائل',
+ rc_msg_formula:'تكلفة الرسالة = تكلفة البيعة × نسبة القفل. مثال: 180 × 10% = 18.'
+}};
+const DOW = {en:['Sat','Sun','Mon','Tue','Wed','Thu','Fri'], ar:['السبت','الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة']};
+const DOW_S = {en:['Sa','Su','Mo','Tu','We','Th','Fr'], ar:['س','ح','ن','ث','ر','خ','ج']};
+
+/* ================= Storage ================= */
+const KEY = 'marina-app-v1';
+const COLORS = ['#c9a24a','#2f5fb3','#1f8a70','#b5487a','#e07a3f','#6a4fb3','#178a9c','#8a6d3b','#d14b4b','#4a6fa5'];
+const OLD_EN = ['Review ad accounts — spend, billing & limits','Check running campaigns — CPR, CTR, CPM, frequency','Reply to page inboxes & comments','Check new leads / new client requests','Send daily update to clients who need it'];
+const uid = () => Math.random().toString(36).slice(2,10);
+function load(){
+  let s=null; try{ s = JSON.parse(localStorage.getItem(KEY)); }catch(e){}
+  if(!s || !s.clients) s = { clients:[], routine:['rt1','rt2','rt3','rt4','rt5'].map(k=>({id:uid(),k})), checks:{}, tasks:[], posts:[], notifyTime:'10:00', lastNotified:'' };
+  return norm(s);
+}
+function norm(s){
+  s.clients ||= []; s.posts ||= []; s.tasks ||= []; s.checks ||= {}; s.routine ||= [];
+  s.campaigns ||= []; s.events ||= []; s.evDone ||= {}; s.lang ||= 'en'; s.currency ||= 'EGP'; s.notifyTime ||= '10:00';
+  s.routine.forEach(r=>{ const i=OLD_EN.indexOf(r.text); if(i>-1){ r.k='rt'+(i+1); delete r.text; } });
+  return s;
+}
+const inClaude = !!(window.claude && window.claude.use);
+let S = load(), storageWarned=false;
+function prune(){ const c=new Date(); c.setDate(c.getDate()-90); const ck=key(c);
+  for(const k in S.checks) if(k<ck) delete S.checks[k]; for(const k in S.evDone) if(k.slice(0,10)<ck) delete S.evDone[k]; }
+const save = () => { prune();
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ if(!storageWarned && !inClaude){ storageWarned=true; setTimeout(()=>toast(t('storage_blocked')),0); } }
+  queueCloud(); };
+
+/* ===== Sync to the viewer's Claude account (only when opened on claude.ai) ===== */
+let cloud=null, lastRev=null, cloudTimer=null, cloudBusy=false, cloudDirty=false, syncState=inClaude?'saving':'local', dlNs=null;
+function setSync(s){ syncState=s; document.querySelectorAll('.sync').forEach(el=>{ el.textContent=t('sync_'+s); el.dataset.s=s; }); }
+function queueCloud(){ if(!cloud) return; clearTimeout(cloudTimer); setSync('saving'); cloudTimer=setTimeout(pushCloud,700); }
+async function pushCloud(){
+  if(!cloud) return; if(cloudBusy){ cloudDirty=true; return; }
+  cloudBusy=true; const rev=uid(); lastRev=rev;
+  try{ await cloud.ref.set({state:JSON.parse(JSON.stringify(S)), rev, at:new Date().toISOString()}); setSync('cloud'); }
+  catch(e){ setSync('err'); }
+  cloudBusy=false; if(cloudDirty){ cloudDirty=false; pushCloud(); }
+}
+async function initCloud(){
+  if(!inClaude) return;
+  claude.use('downloads').then(x=>dlNs=x).catch(()=>{});
+  const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]).catch(()=>[null,null]);
+  const id = user ? await user.id() : null;
+  if(!db || !id){ setSync('local'); return; }
+  cloud={ref:db.doc('data/users/'+id+'/marina')}; render();
+  let first=true; const tm=setTimeout(()=>{ if(first) setSync('err'); },10000);
+  cloud.ref.onSnapshot(snap=>{
+    if(snap.metadata.hasPendingWrites) return;
+    const d=snap.exists?snap.data():null;
+    if(d && d.state && d.rev!==lastRev){ lastRev=d.rev; S=norm(JSON.parse(JSON.stringify(d.state))); try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} render(); }
+    else if(!d && first && (S.clients.length||S.events.length||S.tasks.length||S.campaigns.length)) pushCloud();
+    if(!snap.metadata.fromCache){ first=false; clearTimeout(tm); if(!cloudBusy) setSync('cloud'); }
+  }, ()=>{ clearTimeout(tm); setSync('err'); });
+}
+/* In-page confirmation (online pages can't show browser pop-ups) */
+function confirmBox(msg,onYes,yesLabel){
+  modal(`<h3>${esc(msg)}</h3><div class="mfoot"><button type="button" class="btn plain" onclick="close_()">${t('cancel')}</button><button type="button" class="btn danger" id="cfy">${yesLabel||t('del')}</button></div>`);
+  document.getElementById('cfy').onclick=()=>{ close_(); onYes(); };
+}
+
+/* ================= Helpers ================= */
+function t(k,...a){ let s=(L[S.lang]&&L[S.lang][k]!==undefined)?L[S.lang][k]:(L.en[k]??k); a.forEach((v,i)=>s=s.split('{'+i+'}').join(v)); return s; }
+const pad = n => String(n).padStart(2,'0');
+const key = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const TODAY = () => key(new Date());
+const parse = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
+const loc = () => S.lang==='ar' ? 'ar-EG-u-nu-latn' : 'en-GB';
+const fmt = (k,o={weekday:'short',day:'numeric',month:'short'}) => parse(k).toLocaleDateString(loc(),o);
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const client = id => S.clients.find(c=>c.id===id);
+const camp = id => S.campaigns.find(c=>c.id===id);
+const cColor = id => (client(id)||{}).color || '#999';
+const dayChecks = () => (S.checks[TODAY()] ||= {});
+const TYPES = ['post','reel','story','carousel','adcreative','video'];
+const typeLabel = ty => t('ty_'+String(ty||'post').toLowerCase().replace(/\s/g,''));
+const OBJ = ['messages','leads','sales','traffic','engagement','awareness'];
+const nf = (n,d=2) => isFinite(n) ? Number(n).toLocaleString('en-US',{maximumFractionDigits:d}) : '—';
+const money = n => isFinite(n) ? nf(n, n>=100?0:2)+' '+esc(S.currency) : '—';
+const dayDiff = (a,b) => Math.round((parse(a)-parse(b))/864e5);
+const rtl = () => S.lang==='ar';
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(el._h); el._h=setTimeout(()=>el.classList.remove('show'),2000); }
+
+/* ================= Campaign analytics ================= */
+function agg(es){
+  const s={spend:0,impressions:0,reach:0,clicks:0,results:0,revenue:0,days:es.length};
+  es.forEach(e=>['spend','impressions','reach','clicks','results','revenue'].forEach(k=>s[k]+= +e[k]||0));
+  s.ctr = s.impressions? s.clicks/s.impressions*100 : NaN;
+  s.cpc = s.clicks? s.spend/s.clicks : NaN;
+  s.cpm = s.impressions? s.spend/s.impressions*1000 : NaN;
+  s.cpr = s.results? s.spend/s.results : NaN;
+  s.cvr = s.clicks? s.results/s.clicks*100 : NaN;
+  s.roas = s.spend && s.revenue? s.revenue/s.spend : NaN;
+  s.freq = s.reach? s.impressions/s.reach : NaN;
+  return s;
+}
+const sorted = c => [...(c.entries||[])].sort((a,b)=>a.date.localeCompare(b.date));
+function periodSets(c,p){
+  const es = sorted(c); if(!es.length) return {cur:[],prev:[]};
+  if(p==='7'){
+    const d=new Date(); d.setDate(d.getDate()-6); const c1=key(d); d.setDate(d.getDate()-7); const c0=key(d);
+    const cur=es.filter(e=>e.date>=c1); if(cur.length) return {cur, prev:es.filter(e=>e.date>=c0&&e.date<c1)};
+    p='last';
+  }
+  if(p==='last') return {cur:[es[es.length-1]], prev: es.length>1?[es[es.length-2]]:[]};
+  return {cur:es, prev:[]};
+}
+function analyze(c,p='7'){
+  const items=[]; const add=(lvl,text)=>items.push({lvl,text});
+  if(!(c.entries||[]).length){ add('info',t('i_no_data')); return {m:null,items,health:'none'}; }
+  const {cur,prev}=periodSets(c,p); const m=agg(cur), pm=prev.length?agg(prev):null;
+  const tc=+c.targetCpr, tr=+c.targetRoas, db=+c.dailyBudget;
+  if(tc && isFinite(m.cpr)){ const r=(m.cpr-tc)/tc*100;
+    if(r>20) add('bad',t('i_cpr_bad',money(m.cpr),nf(r,0),money(tc)));
+    else if(r<=0) add('good',t('i_cpr_good',money(m.cpr),money(tc)));
+    else add('watch',t('i_cpr_near',money(m.cpr),money(tc))); }
+  if(isFinite(m.ctr) && m.impressions>=500){ if(m.ctr<0.8) add('watch',t('i_ctr_low',nf(m.ctr))); else if(m.ctr>=2) add('good',t('i_ctr_good',nf(m.ctr))); }
+  if(isFinite(m.freq) && m.freq>3) add('watch',t('i_freq_high',nf(m.freq,1)));
+  if(isFinite(m.cvr) && m.clicks>=30 && (!isFinite(m.ctr)||m.ctr>=0.8) && m.cvr<2 && ['sales','leads','messages'].includes(c.objective)) add('watch',t('i_cvr_low',nf(m.cvr)));
+  if(isFinite(m.roas)){ if(m.roas<1) add('bad',t('i_roas_loss',nf(m.roas)));
+    else if(tr && m.roas<tr) add('watch',t('i_roas_low',nf(m.roas),nf(tr)));
+    else if(tr) add('good',t('i_roas_good',nf(m.roas),nf(tr))); }
+  if(pm){
+    if(isFinite(m.cpr)&&isFinite(pm.cpr)&&pm.cpr){ const d=(m.cpr-pm.cpr)/pm.cpr*100; if(d>25) add('watch',t('i_cpr_up',nf(d,0))); else if(d<-15) add('good',t('i_cpr_down',nf(-d,0))); }
+    if(isFinite(m.cpm)&&isFinite(pm.cpm)&&pm.cpm){ const d=(m.cpm-pm.cpm)/pm.cpm*100; if(d>30) add('watch',t('i_cpm_up',nf(d,0))); }
+  }
+  if(db && m.days && m.spend){ const pace=m.spend/(db*m.days)*100; if(pace<70) add('watch',t('i_under',nf(pace,0))); else if(pace>125) add('watch',t('i_over',nf(pace,0))); }
+  if(c.status==='active'){ const es=sorted(c); const dd=dayDiff(TODAY(),es[es.length-1].date); if(dd>=2) add('watch',t('i_stale',dd)); }
+  const order={bad:0,watch:1,good:2,info:3}; items.sort((a,b)=>order[a.lvl]-order[b.lvl]);
+  const health = items.some(i=>i.lvl==='bad')?'bad':items.some(i=>i.lvl==='watch')?'watch':'good';
+  return {m,pm,items,health};
+}
+const ICON={bad:'⛔',watch:'⚠️',good:'✅',info:'💡'};
+const insHtml = i => `<div class="ins ${i.lvl}"><span class="i">${ICON[i.lvl]}</span><span>${esc(i.text)}</span></div>`;
+
+/* ================= Agenda logic ================= */
+const KINDS={service:['spiritual','⛪'],prayer:['spiritual','🙏'],church_meeting:['spiritual','👥'],reading:['spiritual','📖'],
+  meeting:['work','🤝'],content:['work','✍️'],ads:['work','📣'],worktask:['work','💼'],appointment:['personal','📌'],other:['personal','⭐']};
+const CATS=['spiritual','work','personal'], CAT_COLOR={spiritual:'#c9a24a',work:'#2f5fb3',personal:'#b5487a'};
+const kCat = ev => (KINDS[ev.kind]||KINDS.other)[0], kIcon = ev => (KINDS[ev.kind]||KINDS.other)[1];
+function occursOn(ev,k){
+  if(k<ev.date) return false;
+  if(ev.repeat==='daily') return true;
+  if(ev.repeat==='weekly'){ const w=(ev.wdays&&ev.wdays.length)?ev.wdays.map(Number):[parse(ev.date).getDay()]; return w.includes(parse(k).getDay()); }
+  if(ev.repeat==='monthly') return parse(k).getDate()===parse(ev.date).getDate();
+  return k===ev.date;
+}
+const occ = (k,cat='all') => S.events.filter(e=>occursOn(e,k)&&(cat==='all'||kCat(e)===cat)).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));
+const evIsDone = (id,k) => !!S.evDone[k+'|'+id];
+function nextOcc(ev){ const d=new Date(); for(let i=0;i<70;i++){ const k=key(d); if(occursOn(ev,k)) return k; d.setDate(d.getDate()+1);} return null; }
+const fmtTime = tm => { if(!tm) return '—'; const [h,m]=tm.split(':').map(Number); return new Date(2000,0,1,h,m).toLocaleTimeString(loc(),{hour:'numeric',minute:'2-digit'}); };
+
+/* ================= Derived ================= */
+function todayInfo(){
+  const td=TODAY(), ch=S.checks[td]||{};
+  const active=S.clients.filter(c=>c.status==='active'), newC=S.clients.filter(c=>c.status==='new');
+  const postsToday=S.posts.filter(p=>p.date===td);
+  const overdue=S.posts.filter(p=>p.date<td && !p.done).sort((a,b)=>a.date.localeCompare(b.date));
+  const tasks=S.tasks.filter(x=>x.date===td || (x.date<td && !x.done));
+  const alerts=S.campaigns.filter(c=>c.status==='active').map(c=>({c,a:analyze(c)})).filter(x=>x.a.health==='bad'||x.a.health==='watch');
+  const agenda=occ(td), agDone=agenda.filter(e=>evIsDone(e.id,td)).length;
+  const total=S.routine.length+active.length*2+postsToday.length+tasks.length+newC.length+agenda.length;
+  const done=S.routine.filter(r=>ch['r_'+r.id]).length + active.reduce((n,c)=>n+(ch['acc_'+c.id]?1:0)+(ch['cmp_'+c.id]?1:0),0) + postsToday.filter(p=>p.done).length + tasks.filter(x=>x.done).length + agDone;
+  return {td,ch,active,newC,postsToday,overdue,tasks,alerts,agenda,agLeft:agenda.length-agDone,total,done,left:total-done};
+}
+
+/* ================= Render ================= */
+let view='today', calMonth=new Date(); calMonth.setDate(1);
+let clientFilter='all', calClient='all', campClient='all', campStatus='active';
+
+function render(){
+  document.documentElement.lang=S.lang; document.documentElement.dir=rtl()?'rtl':'ltr';
+  document.title = S.lang==='ar' ? 'مارينا' : 'Marina';
+  document.getElementById('tagline').textContent=t('tagline');
+  document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
+  document.getElementById('sideNote').textContent = cloud ? t('side_cloud') : t('side_foot');
+  setSync(syncState);
+  document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('on',b.dataset.lang===S.lang));
+  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  const I=todayInfo();
+  const setCount=(id,n)=>{const el=document.getElementById(id); el.textContent=n>0?n:''; el.style.display=n>0?'':'none';};
+  setCount('navToday',I.left); setCount('navCamps',I.alerts.length); setCount('navAgenda',I.agLeft);
+  document.getElementById('main').innerHTML=({today:vToday,agenda:vAgenda,campaigns:vCampaigns,clients:vClients,calendar:vCalendar,settings:vSettings})[view](I);
+  if(view==='campaigns'){ calcRun(); roasRun(); }
+}
+
+function ring(p){
+  const r=32,c=2*Math.PI*r;
+  return `<svg class="ring" viewBox="0 0 76 76"><circle cx="38" cy="38" r="${r}" fill="none" stroke="rgba(230,201,127,.2)" stroke-width="7"/>
+  <circle cx="38" cy="38" r="${r}" fill="none" stroke="#e6c97f" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-p)}" transform="rotate(-90 38 38)"/>
+  <text x="38" y="43" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">${Math.round(p*100)}%</text></svg>`;
+}
+const stat=(n,l,color='')=>`<div class="card stat"><div class="n" style="${color?'color:'+color:''}">${n}</div><div class="l">${l}</div></div>`;
+const chk=(on,fn,text)=>`<div class="check ${on?'done':''}"><div class="box ${on?'on':''}" onclick="${fn}"></div><div class="txt">${text}</div></div>`;
+const rText = r => esc(r.text || t(r.k));
+
+function vToday(I){
+  const h=new Date().getHours(), greet=h<12?t('gm'):h<17?t('ga'):t('ge');
+  const pct=I.total?I.done/I.total:0;
+  const msg=I.total===0?t('msg_start'):I.left===0?t('msg_done'):t('msg_left',I.left);
+  return `
+  <div class="head"><div><h1>${t('hello',greet)}</h1><div class="sub">${fmt(I.td,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div></div>
+    <div class="row"><button class="btn ghost" onclick="openTask()">${t('btn_task')}</button><button class="btn" onclick="openClient()">${t('btn_client')}</button></div></div>
+  <div class="banner"><div><div class="big">${msg}</div><div style="opacity:.85;margin-top:4px">${t('checks_done',I.done,I.total)}</div></div>${ring(pct)}</div>
+  <div class="stats">${stat(I.active.length,t('s_active'))}${stat(I.newC.length,t('s_new'))}${stat(I.postsToday.length,t('s_posts'))}
+    ${stat(I.overdue.length,t('s_overdue'),I.overdue.length?'var(--bad)':'')}${stat(I.alerts.length,t('s_alerts'),I.alerts.length?'var(--warn)':'')}</div>
+  <div class="grid g2">
+    <div class="grid" style="align-content:start">
+      <div class="card"><h2>☑ ${t('routine')} <span class="tag">${S.routine.filter(r=>I.ch['r_'+r.id]).length}/${S.routine.length}</span></h2>
+        ${S.routine.map(r=>chk(I.ch['r_'+r.id],`togCheck('r_${r.id}')`,rText(r))).join('')||`<div class="empty">${t('routine_empty')}</div>`}</div>
+      <div class="card"><h2>📊 ${t('checkin')} <span class="tag">${t('tag_active')}</span></h2>
+        ${I.active.length?`<div class="ci h"><div>${t('col_client')}</div><div class="c">${t('col_acc')}</div><div class="c">${t('col_cmp')}</div></div>`+
+          I.active.map(c=>`<div class="ci"><div class="who"><i class="dot" style="background:${c.color}"></i><span>${esc(c.name)}</span>${c.platform?`<span class="meta">· ${esc(c.platform)}</span>`:''}</div>
+          <div class="c"><div class="box ${I.ch['acc_'+c.id]?'on':''}" onclick="togCheck('acc_${c.id}')"></div></div>
+          <div class="c"><div class="box ${I.ch['cmp_'+c.id]?'on':''}" onclick="togCheck('cmp_${c.id}')"></div></div></div>`).join('')
+          :`<div class="empty">${t('checkin_empty')}</div>`}</div>
+      <div class="card"><h2>📈 ${t('alerts_title')} <span class="tag">${I.alerts.length}</span></h2>
+        ${I.alerts.length?I.alerts.map(({c,a})=>{const cl=client(c.clientId); const top=a.items.find(i=>i.lvl===a.health)||a.items[0];
+          return `<div class="alert" onclick="openCamp('${c.id}')"><i class="dot" style="background:${cColor(c.clientId)};margin-top:5px"></i><div class="txt"><b>${esc(c.name)}</b> <span class="meta">· ${esc(cl?cl.name:'')}</span><div class="meta" style="margin-top:3px">${esc(top.text)}</div></div><span class="pill ${a.health}">${t('h_'+a.health)}</span></div>`}).join('')
+          :`<div class="empty">${t('alerts_empty')}</div>`}
+        <div class="quick"><button class="btn sm plain" onclick="go('campaigns')">${t('open_camps')}</button></div></div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card"><h2>📅 ${t('ag_today')} <span class="tag">${I.agenda.length-I.agLeft}/${I.agenda.length}</span></h2>
+        ${I.agenda.length?I.agenda.map(e=>evRow(e,I.td)).join(''):`<div class="empty">${t('ag_empty_today')}</div>`}
+        <div class="quick"><button class="btn sm ghost" onclick="openEvent()">${t('add_ev')}</button><button class="btn sm plain" onclick="go('agenda')">${t('nav_agenda')} →</button></div></div>
+      ${I.newC.length?`<div class="card"><h2>✨ ${t('onboard')}</h2>
+        ${I.newC.map(c=>`<div class="check"><i class="dot" style="background:${c.color}"></i><div class="txt"><b>${esc(c.name)}</b><div class="meta">${esc(c.platform||'')} ${c.notes?'· '+esc(c.notes):''}</div></div>
+        <button class="btn sm ghost" onclick="setStatus('${c.id}','active')">${t('mark_active')}</button></div>`).join('')}</div>`:''}
+      <div class="card"><h2>🗓 ${t('content_today')} <span class="tag">${I.postsToday.filter(p=>p.done).length}/${I.postsToday.length}</span></h2>
+        ${I.postsToday.length?I.postsToday.map(p=>postRow(p)).join(''):`<div class="empty">${t('content_empty')}</div>`}
+        ${I.overdue.length?`<div style="margin-top:12px"><span class="pill over">${t('overdue')}</span></div>${I.overdue.map(p=>postRow(p,true)).join('')}`:''}
+        <div class="quick"><button class="btn sm ghost" onclick="openPost('${I.td}')">${t('plan_post')}</button><button class="btn sm plain" onclick="go('calendar')">${t('open_cal')}</button></div></div>
+      <div class="card"><h2>📝 ${t('mytasks')}</h2>
+        ${I.tasks.length?I.tasks.map(x=>`<div class="check ${x.done?'done':''}"><div class="box ${x.done?'on':''}" onclick="togTask('${x.id}')"></div><div class="txt">${esc(x.text)}${x.clientId&&client(x.clientId)?` <span class="meta">· ${esc(client(x.clientId).name)}</span>`:''}${x.date<I.td?` <span class="pill over">${t('from',fmt(x.date))}</span>`:''}</div><button class="x" onclick="delTask('${x.id}')">✕</button></div>`).join(''):`<div class="empty">${t('tasks_empty')}</div>`}
+        <form class="quick" onsubmit="quickTask(event)"><input id="qt" placeholder="${t('task_ph')}"><button class="btn sm">${t('add')}</button></form></div>
+    </div>
+  </div>`;
+}
+function postRow(p,late){
+  const c=client(p.clientId);
+  return `<div class="check ${p.done?'done':''}"><div class="box ${p.done?'on':''}" onclick="togPost('${p.id}')"></div><i class="dot" style="background:${cColor(p.clientId)}"></i>
+  <div class="txt" style="cursor:pointer" onclick="openPost('${p.date}','${p.id}')"><b>${esc(c?c.name:'—')}</b> · ${typeLabel(p.type)}${p.title?` <span class="meta">— ${esc(p.title)}</span>`:''}${late?` <span class="meta">(${fmt(p.date)})</span>`:''}</div></div>`;
+}
+
+/* ---------- Agenda view ---------- */
+let agendaCat='all';
+function evRow(e,k){
+  const done=evIsDone(e.id,k), td=(e.todos||[]), tdn=td.filter(x=>x.done).length;
+  return `<div class="check ${done?'done':''}"><div class="box ${done?'on':''}" onclick="togEv('${e.id}','${k}')"></div>
+    <div class="meta" style="min-width:62px;font-weight:700;color:var(--ink)">${fmtTime(e.time)}</div><span style="font-size:16px">${kIcon(e)}</span>
+    <div class="txt" style="cursor:pointer" onclick="openEvent('${e.id}')"><b>${esc(e.title)}</b> <span class="meta">${e.title!==t('k_'+e.kind)?'· '+t('k_'+e.kind):''}${e.location?' · '+esc(e.location):''}</span>
+    ${td.length?` <span class="pill ${tdn===td.length?'good':'new'}">☑ ${tdn}/${td.length}</span>`:''}</div></div>`;
+}
+function vAgenda(){
+  const td=TODAY(), cat=agendaCat; let week='';
+  for(let i=1;i<=7;i++){ const d=new Date(); d.setDate(d.getDate()+i); const k=key(d), es=occ(k,cat);
+    if(es.length) week+=`<div class="meta" style="font-weight:700;margin:12px 0 2px;color:var(--navy)">${fmt(k,{weekday:'long',day:'numeric',month:'short'})}</div>${es.map(e=>evRow(e,k)).join('')}`; }
+  const all=S.events.filter(e=>cat==='all'||kCat(e)===cat);
+  const quick=['service','prayer','church_meeting','reading','meeting','appointment'];
+  return `<div class="head"><div><h1>${t('ag_title')}</h1><div class="sub">${t('ag_sub')}</div></div><button class="btn" onclick="openEvent()">${t('add_ev')}</button></div>
+  <div class="calbar"><div class="filters">${['all',...CATS].map(f=>`<button class="chipbtn ${cat===f?'on':''}" onclick="agendaCat='${f}';render()">${f==='all'?t('f_all'):`<i class="dot" style="background:${CAT_COLOR[f]}"></i> `+t('cat_'+f)}</button>`).join('')}</div>
+    <div class="row" style="margin-inline-start:auto;flex-wrap:wrap"><span class="meta">${t('ag_quick')}:</span>${quick.map(q=>`<button class="chipbtn" onclick="openEvent(null,'${q}')">${KINDS[q][1]} ${t('k_'+q)}</button>`).join('')}</div></div>
+  <div class="grid g2">
+    <div class="grid" style="align-content:start">
+      <div class="card"><h2>☀ ${t('ag_today')}</h2>${occ(td,cat).map(e=>evRow(e,td)).join('')||`<div class="empty">${t('ag_empty_today')}</div>`}</div>
+      <div class="card"><h2>🗓 ${t('ag_week')}</h2>${week||`<div class="empty">${t('ag_week_empty')}</div>`}</div>
+    </div>
+    <div class="card" style="align-self:start"><h2>📋 ${t('ag_all')} <span class="tag">${all.length}</span></h2>
+      ${all.length?all.map(e=>{const nx=nextOcc(e); return `<div style="border-inline-start:4px solid ${CAT_COLOR[kCat(e)]};padding:10px 12px;border-radius:10px;background:var(--bg);margin-bottom:10px">
+        <div class="top"><div style="cursor:pointer" onclick="openEvent('${e.id}')"><b>${kIcon(e)} ${esc(e.title)}</b><div class="meta">${t('k_'+e.kind)} · ${t('r_'+(e.repeat||'none'))}${e.time?' · '+fmtTime(e.time):''}${e.location?' · '+esc(e.location):''}</div></div>
+          <span class="meta">${nx?t('next_on',fmt(nx)):''}</span></div>
+        ${e.notes?`<div class="meta" style="margin-top:4px">${esc(e.notes)}</div>`:''}
+        ${(e.todos||[]).map(x=>`<div class="check ${x.done?'done':''}" style="padding:6px 0"><div class="box ${x.done?'on':''}" onclick="togTodo('${e.id}','${x.id}')"></div><div class="txt">${esc(x.text)}</div></div>`).join('')}</div>`}).join('')
+      :`<div class="empty">${t('ag_all_empty')}</div>`}</div>
+  </div>`;
+}
+
+/* ---------- Campaigns view ---------- */
+function vCampaigns(){
+  const mk=TODAY().slice(0,7);
+  const monthEntries=S.campaigns.flatMap(c=>(c.entries||[]).filter(e=>e.date.startsWith(mk)));
+  const ma=agg(monthEntries);
+  const list=S.campaigns.filter(c=>(campClient==='all'||c.clientId===campClient)&&(campStatus==='all'||c.status===campStatus));
+  const needAct=S.campaigns.filter(c=>c.status==='active'&&analyze(c).health==='bad').length;
+  return `<div class="head"><div><h1>${t('camps_title')}</h1><div class="sub">${t('camps_sub')}</div></div><button class="btn" onclick="openCampForm()">${t('new_camp')}</button></div>
+  <div class="stats">${stat(money(ma.spend),t('m_spend'))}${stat(nf(ma.results,0),t('m_results'))}${stat(money(ma.cpr),t('m_cpr'))}${stat(needAct,t('m_action'),needAct?'var(--bad)':'')}</div>
+  <div class="calbar"><div class="filters">${['active','paused','ended','all'].map(f=>`<button class="chipbtn ${campStatus===f?'on':''}" onclick="campStatus='${f}';render()">${f==='all'?t('f_all'):t('st_'+f)}</button>`).join('')}</div>
+   <select style="width:auto;margin-inline-start:auto" onchange="campClient=this.value;render()"><option value="all">${t('all_clients')}</option>${S.clients.map(c=>`<option value="${c.id}" ${campClient===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+  ${list.length?`<div class="cgrid">${list.map(campCard).join('')}</div>`:`<div class="card empty" style="text-align:center;padding:36px">${t('camps_empty')}<br><br><button class="btn" onclick="openCampForm()">${t('new_camp')}</button></div>`}
+  ${roasCard()}
+  <div class="card" style="margin-top:18px"><h2>🧮 ${t('calc_title')}</h2><div class="calc">
+    <div><div class="meta" style="font-weight:700;margin-bottom:8px">${t('calc_a')}</div><div class="fgrid">
+      <div><label>${t('calc_budget')}</label><input type="number" id="cb" value="5000" oninput="calcRun()"></div>
+      <div><label>${t('calc_cpr')}</label><input type="number" id="cc" value="25" oninput="calcRun()"></div>
+      <div class="full"><label>${t('calc_need')}</label><input type="number" id="cn" value="300" oninput="calcRun()"></div></div>
+      <div class="out"><span>${t('calc_results')}</span><span id="o1" dir="ltr"></span></div><div class="out"><span>${t('calc_needbudget')}</span><span id="o2" dir="ltr"></span></div></div>
+  </div></div>`;
+}
+/* ---------- Business ROAS calculator ---------- */
+const RC_F=[['price','rc_price',600],['cost','rc_cost',250],['ship','rc_ship',50],['fees','rc_fees',5],['margin','rc_margin',15],['fixed','rc_fixed',''],['orders','rc_orders',''],['close','rc_close',10],['actual','rc_actual','']];
+function roasCard(){
+  S.roasCalc ||= {}; RC_F.forEach(([k,,d])=>{ if(S.roasCalc[k]===undefined) S.roasCalc[k]=d; });
+  return `<div class="card" style="margin-top:18px;border-top:4px solid var(--gold)"><h2>🎯 ${t('rc_title')}</h2>
+    <div class="meta" style="margin-bottom:14px">${t('rc_sub')}</div>
+    <div class="calc"><div><div class="fgrid">${RC_F.map(([k,l])=>`<div><label>${t(l)}${['price','cost','ship','fixed'].includes(k)?' ('+esc(S.currency)+')':''}</label><input type="number" step="any" min="0" id="rc_${k}" value="${esc(S.roasCalc[k])}" oninput="roasRun()"></div>`).join('')}</div>
+      <div class="hint" style="margin:14px 0 0">📐 ${t('rc_formula')}<br>💬 ${t('rc_msg_formula')}</div></div>
+    <div id="rcOut"></div></div></div>`;
+}
+function roasRun(){
+  const out=document.getElementById('rcOut'); if(!out) return;
+  const v={}; RC_F.forEach(([k])=>{ const el=document.getElementById('rc_'+k); v[k]=el.value===''?NaN:+el.value; S.roasCalc[k]=el.value; }); save();
+  const row=(l,val,d='')=>`<div class="out"><span>${l}${d?`<br><small style="font-weight:400;opacity:.8">${d}</small>`:''}</span><span dir="ltr" style="align-self:center">${val}</span></div>`;
+  const price=v.price||0, fixedPO=(v.fixed>0&&v.orders>0)?v.fixed/v.orders:0;
+  const profit=price-(v.cost||0)-(v.ship||0)-price*(v.fees||0)/100-fixedPO;
+  if(!price){ out.innerHTML=''; return; }
+  let h=fixedPO?row(t('rc_fixed_po'),money(fixedPO),t('rc_fixed_d',money(v.fixed),nf(v.orders,0))):'';
+  if(profit<=0){ out.innerHTML=h+insHtml({lvl:'bad',text:t('rc_noprofit',money(profit))}); return; }
+  const be=price/profit, maxM=profit/price*100, m=v.margin||0, close=v.close>0?v.close:0;
+  h+=row(t('rc_profit'),money(profit))+row(t('rc_be'),nf(be)+'x',t('rc_be_d'))+row(t('rc_becpa'),money(profit));
+  let target=null, exc=null, tcpa=null;
+  if(m>=maxM) h+=insHtml({lvl:'watch',text:t('rc_toohigh',nf(maxM,1))});
+  else { tcpa=profit-price*m/100; target=price/tcpa; exc=target*1.25;
+    h+=row('🎯 '+t('rc_target'),nf(target)+'x',t('rc_target_d',nf(m,1)))+row(t('rc_tcpa'),money(tcpa))+row('🚀 '+t('rc_exc'),'≥ '+nf(exc)+'x'); }
+  if(close){ h+=`<div class="meta" style="font-weight:700;margin:16px 0 0;color:var(--navy)">${t('rc_msg_title')}</div>`;
+    if(tcpa) h+=row('🎯 '+t('rc_msg_t'),money(tcpa*close/100),t('rc_msg_d',nf(close,1)));
+    h+=row(t('rc_msg_be'),money(profit*close/100)); }
+  roasRun.cur={target,tcpa,msg:tcpa&&close?tcpa*close/100:null};
+  // zones bar
+  const top=Math.max((exc||be*1.6)*1.3,(v.actual||0)*1.1), P=x=>Math.min(100,x/top*100);
+  const segs=[[0,be,'var(--bad)',t('z_loss')],[be,target||top,'var(--warn)',t('z_be')]];
+  if(target) segs.push([target,exc,'var(--ok)',t('z_ok')],[exc,top,'#0f6b45',t('z_exc')]);
+  h+=`<div style="margin-top:16px;direction:ltr"><div style="display:flex;height:14px;border-radius:8px;overflow:hidden;position:relative">${segs.map(([a,b,c])=>`<div style="width:${P(b)-P(a)}%;background:${c}"></div>`).join('')}
+    ${isFinite(v.actual)&&v.actual>0?`<div style="position:absolute;left:calc(${P(v.actual)}% - 2px);top:-4px;width:4px;height:22px;background:var(--navy);border-radius:2px"></div>`:''}</div>
+    <div style="position:relative;height:16px;font-size:11px;color:var(--muted)">${[be,target,exc].filter(Boolean).map(x=>`<span style="position:absolute;left:${P(x)}%;transform:translateX(-50%)">${nf(x)}x</span>`).join('')}</div></div>
+    <div class="legend" style="margin-top:4px">${segs.map(([,,c,l])=>`<span><i class="dot" style="background:${c}"></i>${l}</span>`).join('')}</div>`;
+  // verdict for actual ROAS
+  if(isFinite(v.actual)&&v.actual>0){
+    const net=profit-price/v.actual, pct=net/price*100, per1000=(1000*v.actual/price)*profit-1000;
+    const lvl=net<0?'loss':target&&v.actual>=exc?'exc':target&&v.actual>=target?'ok':'be';
+    h+=`<div style="margin-top:12px">${insHtml({lvl:{loss:'bad',be:'watch',ok:'good',exc:'good'}[lvl],text:t('rc_v_'+lvl,nf(v.actual),money(Math.abs(net)),nf(pct,1))})}
+      ${insHtml({lvl:'info',text:t('rc_per1000',money(per1000))})}</div>`;
+  }
+  if(target && S.campaigns.length) h+=`<div class="row" style="margin-top:12px;flex-wrap:wrap"><span class="meta">${t('rc_apply')}</span>
+    <select id="rcCamp" style="width:auto;flex:1">${S.campaigns.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select>
+    <button class="btn sm" onclick="roasApply()">${t('rc_apply_btn')}</button></div>`;
+  out.innerHTML=h;
+}
+function roasApply(){
+  const {target,tcpa,msg}=roasRun.cur, c=camp(document.getElementById('rcCamp').value), r=x=>Math.round(x*100)/100;
+  c.targetRoas=r(target);
+  if(c.objective==='sales') c.targetCpr=r(tcpa); else if(['messages','leads'].includes(c.objective)&&msg) c.targetCpr=r(msg);
+  save(); render(); toast(t('rc_applied'));
+}
+function calcRun(){
+  const v=id=>+document.getElementById(id)?.value||0; const set=(id,s)=>{const el=document.getElementById(id); if(el) el.textContent=s;};
+  const b=v('cb'),c=v('cc'),n=v('cn'),p=v('cp'),m=v('cm');
+  set('o1', c? nf(b/c,0) : '—'); set('o2', c? money(n*c).replace(/&amp;/g,'&') : '—');
+  set('o3', p&&m? money(p*m/100).replace(/&amp;/g,'&') : '—'); set('o4', m? nf(100/m)+'x' : '—');
+}
+function tile(k,v,cls=''){ return `<div class="tile ${cls}"><div class="v">${v}</div><div class="k">${k}</div></div>`; }
+function campCard(c){
+  const a=analyze(c), m=a.m, cl=client(c.clientId), es=sorted(c);
+  const cprCls = m&&+c.targetCpr&&isFinite(m.cpr) ? (m.cpr>c.targetCpr*1.2?'bad':m.cpr<=c.targetCpr?'good':'') : '';
+  const top=a.items[0];
+  return `<div class="card camp" style="--c:${cColor(c.clientId)}">
+    <div class="top"><div><h3>${esc(c.name)}</h3><div class="meta"><i class="dot" style="background:${cColor(c.clientId)}"></i> ${esc(cl?cl.name:'—')} · ${t('obj_'+c.objective)}${c.platform?' · '+esc(c.platform):''}</div></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end"><span class="pill ${a.health}">${t('h_'+a.health)}</span>${c.status!=='active'?`<span class="pill ${c.status}">${t('st_'+c.status)}</span>`:''}</div></div>
+    ${m?`<div class="tiles">${tile(t('spend'),money(m.spend))}${tile(t('results'),nf(m.results,0))}${tile(t('cpr'),money(m.cpr),cprCls)}
+      ${tile(t('ctr'),isFinite(m.ctr)?nf(m.ctr)+'%':'—')}${tile(t('cpm'),money(m.cpm))}${isFinite(m.roas)?tile(t('roas'),nf(m.roas)+'x',m.roas<1?'bad':''):tile(t('freq'),nf(m.freq,1),m.freq>3?'bad':'')}</div>`:''}
+    ${top?insHtml(top):''}
+    <div class="row" style="margin-top:auto"><span class="meta" style="flex:1">${es.length?t('last_upd',fmt(es[es.length-1].date)):t('never_upd')}</span>
+      <button class="btn sm ghost" onclick="openEntry('${c.id}')">${t('add_nums')}</button><button class="btn sm plain" onclick="openCamp('${c.id}')">${t('details')}</button></div></div>`;
+}
+
+/* ---------- Clients view ---------- */
+function vClients(){
+  const list=S.clients.filter(c=>clientFilter==='all'||c.status===clientFilter);
+  const n=s=>S.clients.filter(c=>c.status===s).length;
+  return `<div class="head"><div><h1>${t('clients_title')}</h1><div class="sub">${t('clients_sub',S.clients.length,n('active'),n('new'),n('paused'))}</div></div>
+  <div class="row"><div class="filters">${['all','new','active','paused'].map(f=>`<button class="chipbtn ${clientFilter===f?'on':''}" onclick="clientFilter='${f}';render()">${f==='all'?t('f_all'):t('st_'+f)}</button>`).join('')}</div>
+  <button class="btn" onclick="openClient()">${t('btn_client')}</button></div></div>
+  ${list.length?`<div class="cgrid">${list.map(c=>{
+    const up=S.posts.filter(p=>p.clientId===c.id&&p.date>=TODAY()&&!p.done).length, late=S.posts.filter(p=>p.clientId===c.id&&p.date<TODAY()&&!p.done).length;
+    const cps=S.campaigns.filter(x=>x.clientId===c.id&&x.status==='active').length;
+    return `<div class="card client" style="--c:${c.color}"><div class="top"><div><h3>${esc(c.name)}</h3><div class="meta">${esc(c.platform||'')}</div></div><span class="pill ${c.status}">${t('st_'+c.status)}</span></div>
+    <dl class="kv">${c.account?`<dt>${t('k_account')}</dt><dd>${esc(c.account)}</dd>`:''}${c.budget?`<dt>${t('k_budget')}</dt><dd>${esc(c.budget)}</dd>`:''}${c.contact?`<dt>${t('k_contact')}</dt><dd>${esc(c.contact)}</dd>`:''}${c.start?`<dt>${t('k_start')}</dt><dd>${fmt(c.start)}</dd>`:''}
+    <dt>${t('k_content')}</dt><dd>${t('upcoming',up)}${late?` · <span style="color:var(--bad)">${t('overdue_n',late)}</span>`:''}</dd><dt>${t('k_camps')}</dt><dd>${t('camps_n',cps)}</dd></dl>
+    ${c.notes?`<div class="meta">${esc(c.notes)}</div>`:''}
+    <div class="row" style="margin-top:auto"><button class="btn sm ghost" onclick="openPlan('${c.id}')">${t('plan_posts')}</button><button class="btn sm ghost" onclick="openCampForm(null,'${c.id}')">${t('new_camp')}</button><button class="btn sm plain" onclick="openClient('${c.id}')">${t('edit')}</button></div></div>`;}).join('')}</div>`
+  :`<div class="card empty" style="text-align:center;padding:40px">${t('clients_empty')}<br><br><button class="btn" onclick="openClient()">${t('first_client')}</button></div>`}`;
+}
+
+/* ---------- Calendar view ---------- */
+function vCalendar(){
+  const y=calMonth.getFullYear(), mo=calMonth.getMonth();
+  const first=new Date(y,mo,1), start=new Date(first); start.setDate(1-((first.getDay()+1)%7));
+  const td=TODAY(); let cells='';
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i); const k=key(d);
+    if(i>=35 && d.getMonth()!==mo) break;
+    const ps=S.posts.filter(p=>p.date===k&&(calClient==='all'||p.clientId===calClient)), done=ps.filter(p=>p.done).length;
+    cells+=`<div class="day ${d.getMonth()!==mo?'out':''} ${k===td?'today':''} ${k===selDay?'sel':''}" onclick="dayClick('${k}')">
+      <div class="dn"><b>${d.getDate()}</b>${ps.length?`<span class="meta">${done}/${ps.length}</span>`:''}</div>
+      <div class="posts">${ps.map(p=>{const c=client(p.clientId);return `<div class="post ${p.done?'done':''} ${!p.done&&k<td?'late':''}" style="--c:${cColor(p.clientId)}" onclick="event.stopPropagation();openPost('${p.date}','${p.id}')" title="${esc((c?c.name:'')+' · '+typeLabel(p.type)+(p.title?' — '+p.title:''))}">
+        <span class="pb" onclick="event.stopPropagation();togPost('${p.id}')"></span><span class="pt">${esc(c?c.name:'—')} · ${typeLabel(p.type)}</span></div>`}).join('')}</div></div>`;
+  }
+  const sp=S.posts.filter(p=>p.date===selDay&&(calClient==='all'||p.clientId===calClient));
+  const dayPanel=`<div class="card" style="margin-top:14px"><h2>📌 ${fmt(selDay,{weekday:'long',day:'numeric',month:'long'})} <span class="tag">${sp.filter(p=>p.done).length}/${sp.length}</span></h2>
+    ${sp.map(p=>postRow(p,p.date<td&&!p.done)).join('')||`<div class="empty">${t('content_empty')}</div>`}
+    <div class="quick"><button class="btn sm ghost" onclick="openPost('${selDay}')">${t('plan_post')}</button></div></div>`;
+  const mp=S.posts.filter(p=>{const d=parse(p.date);return d.getFullYear()===y&&d.getMonth()===mo&&(calClient==='all'||p.clientId===calClient)});
+  const prevA=rtl()?'›':'‹', nextA=rtl()?'‹':'›';
+  return `<div class="head"><div><h1>${t('cal_title')}</h1><div class="sub">${t('cal_sub',mp.filter(p=>p.done).length,mp.length)}</div></div>
+   <div class="row"><button class="btn ghost" onclick="openPlan()">${t('monthly_plan')}</button><button class="btn" onclick="openPost('${td}')">${t('add_post')}</button></div></div>
+  <div class="calbar"><button class="btn ghost sm" onclick="shiftMonth(-1)">${prevA}</button><div class="m">${first.toLocaleDateString(loc(),{month:'long',year:'numeric'})}</div><button class="btn ghost sm" onclick="shiftMonth(1)">${nextA}</button>
+   <button class="btn plain sm" onclick="calMonth=new Date();calMonth.setDate(1);render()">${t('today_btn')}</button>
+   <select style="width:auto;margin-inline-start:auto" onchange="calClient=this.value;render()"><option value="all">${t('all_clients')}</option>${S.clients.map(c=>`<option value="${c.id}" ${calClient===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+  <div class="cal">${(isMobile()?DOW_S:DOW)[S.lang].map(d=>`<div class="dow">${d}</div>`).join('')}${cells}</div>
+  ${dayPanel}
+  <div class="legend">${S.clients.map(c=>`<span><i class="dot" style="background:${c.color}"></i>${esc(c.name)}</span>`).join('')}<span><i class="dot" style="background:var(--bad)"></i>${t('overdue_legend')}</span></div>`;
+}
+
+/* ---------- Settings view ---------- */
+function vSettings(){
+  const perm=('Notification' in window)?Notification.permission:'unsupported';
+  return `<div class="head"><div><h1>${t('set_title')}</h1><div class="sub">${t('set_sub')}</div></div></div>
+  <div class="grid g2">
+    <div class="card" style="align-self:start"><h2>☑ ${t('routine_items')}</h2>
+      ${S.routine.map(r=>`<div class="check"><div class="txt">${rText(r)}</div><button class="btn sm plain" onclick="delRoutine('${r.id}')">${t('remove')}</button></div>`).join('')}
+      <form class="quick" onsubmit="addRoutine(event)"><input id="nr" placeholder="${t('routine_ph')}"><button class="btn sm">${t('add')}</button></form></div>
+    <div class="grid" style="align-content:start">
+      <div class="card"><h2>🌐 ${t('prefs')}</h2><div class="fgrid">
+        <div><label>${t('lang')}</label><select onchange="setLang(this.value)"><option value="en" ${S.lang==='en'?'selected':''}>English</option><option value="ar" ${S.lang==='ar'?'selected':''}>عربي</option></select></div>
+        <div><label>${t('currency')}</label><input value="${esc(S.currency)}" onchange="S.currency=this.value.trim()||'EGP';save();toast(t('saved'))"></div></div></div>
+      <div class="card"><h2>🔔 ${t('remind')}</h2>
+        <div class="meta" style="margin-bottom:10px">${t('remind_desc')} ${t('status')}: <b>${perm}</b></div>
+        <div class="row"><div style="flex:1"><label>${t('remind_time')}</label><input type="time" value="${S.notifyTime}" onchange="S.notifyTime=this.value;save();toast(t('saved'))"></div>
+        <button class="btn ghost" style="align-self:flex-end" onclick="askNotify()">${t('enable_notif')}</button></div></div>
+      <div class="card"><h2>💾 ${t('backup')}</h2>
+        <div class="meta" style="margin-bottom:10px">${t('backup_desc')}</div>
+        <div class="row"><button class="btn ghost" onclick="exportData()">${t('export')}</button><label class="btn ghost" style="margin:0;font-size:14px;color:var(--navy)">${t('import')}<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label></div></div>
+    </div>
+  </div>`;
+}
+
+/* ================= Actions ================= */
+function go(v){ view=v; render(); window.scrollTo(0,0); }
+function setLang(l){ S.lang=l; save(); render(); }
+function togCheck(k){ const c=dayChecks(); c[k]=!c[k]; save(); render(); }
+function togTask(id){ const x=S.tasks.find(q=>q.id===id); x.done=!x.done; save(); render(); }
+function delTask(id){ S.tasks=S.tasks.filter(q=>q.id!==id); save(); render(); }
+function togPost(id){ const p=S.posts.find(q=>q.id===id); p.done=!p.done; save(); render(); if(p.done) toast(t('posted_t')); }
+function setStatus(id,s){ client(id).status=s; save(); render(); toast(t('client_now',t('st_'+s))); }
+function quickTask(e){ e.preventDefault(); const v=document.getElementById('qt').value.trim(); if(!v) return; S.tasks.push({id:uid(),text:v,date:TODAY(),done:false}); save(); render(); document.getElementById('qt')?.focus(); }
+function addRoutine(e){ e.preventDefault(); const v=document.getElementById('nr').value.trim(); if(!v) return; S.routine.push({id:uid(),text:v}); save(); render(); }
+function delRoutine(id){ S.routine=S.routine.filter(r=>r.id!==id); save(); render(); }
+function shiftMonth(n){ calMonth.setMonth(calMonth.getMonth()+n); render(); }
+let selDay=TODAY();
+const isMobile=()=>matchMedia('(max-width:760px)').matches;
+function dayClick(k){ selDay=k; if(isMobile()) render(); else openPost(k); }
+
+/* ================= Modals ================= */
+const ov=document.getElementById('ov'), md=document.getElementById('modal');
+function modal(html,wide){ md.className='modal'+(wide?' wide':''); md.innerHTML=html; ov.classList.add('show'); setTimeout(()=>md.querySelector('input:not([type=date]),select')?.focus(),30); }
+function close_(){ ov.classList.remove('show'); }
+ov.addEventListener('click',e=>{ if(e.target===ov) close_(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') close_(); });
+const clientOpts=sel=>S.clients.map(c=>`<option value="${c.id}" ${sel===c.id?'selected':''}>${esc(c.name)}</option>`).join('');
+function needClient(){ if(S.clients.length) return false; toast(t('add_client_first')); openClient(); return true; }
+const foot=(delFn,okLabel)=>`<div class="mfoot">${delFn?`<button type="button" class="btn danger start" onclick="${delFn}">${t('del')}</button>`:''}<button type="button" class="btn plain" onclick="close_()">${t('cancel')}</button><button class="btn">${okLabel}</button></div>`;
+
+function openClient(id){
+  const c=id?client(id):{status:'new',start:TODAY()};
+  modal(`<h3>${id?t('edit_client_t'):t('add_client_t')}</h3><form onsubmit="saveClient(event,'${id||''}')"><div class="fgrid">
+    <div class="full"><label>${t('f_name')}</label><input name="name" required value="${esc(c.name)}"></div>
+    <div><label>${t('f_platform')}</label><input name="platform" placeholder="${t('f_platform_ph')}" value="${esc(c.platform)}"></div>
+    <div><label>${t('f_status')}</label><select name="status">${['new','active','paused'].map(s=>`<option value="${s}" ${c.status===s?'selected':''}>${t('st_'+s)}</option>`).join('')}</select></div>
+    <div><label>${t('f_account')}</label><input name="account" placeholder="${t('f_account_ph')}" value="${esc(c.account)}"></div>
+    <div><label>${t('f_budget')}</label><input name="budget" placeholder="${t('f_budget_ph')}" value="${esc(c.budget)}"></div>
+    <div><label>${t('f_contact')}</label><input name="contact" placeholder="${t('f_contact_ph')}" value="${esc(c.contact)}"></div>
+    <div><label>${t('f_start')}</label><input type="date" name="start" value="${esc(c.start)}"></div>
+    <div class="full"><label>${t('f_notes')}</label><textarea name="notes" rows="2" placeholder="${t('f_notes_ph')}">${esc(c.notes)}</textarea></div>
+  </div>${foot(id?`delClient('${id}')`:'',id?t('save'):t('add_client_btn'))}</form>`);
+}
+function saveClient(e,id){
+  e.preventDefault(); const f=Object.fromEntries(new FormData(e.target));
+  if(id) Object.assign(client(id),f); else S.clients.push({id:uid(),color:COLORS[S.clients.length%COLORS.length],...f});
+  save(); close_(); render(); toast(id?t('client_updated'):t('client_added'));
+}
+function delClient(id){
+  confirmBox(t('confirm_del_client'),()=>{ S.clients=S.clients.filter(c=>c.id!==id); S.posts=S.posts.filter(p=>p.clientId!==id); S.campaigns=S.campaigns.filter(c=>c.clientId!==id); save(); render(); });
+}
+
+function openTask(){
+  modal(`<h3>${t('new_task_t')}</h3><form onsubmit="saveTask(event)"><div class="fgrid">
+    <div class="full"><label>${t('f_task')}</label><input name="text" required placeholder="${t('f_task_ph')}"></div>
+    <div><label>${t('f_date')}</label><input type="date" name="date" value="${TODAY()}"></div>
+    <div><label>${t('f_client_opt')}</label><select name="clientId"><option value="">—</option>${clientOpts()}</select></div>
+  </div>${foot('',t('add_task'))}</form>`);
+}
+function saveTask(e){ e.preventDefault(); const f=Object.fromEntries(new FormData(e.target)); S.tasks.push({id:uid(),done:false,...f}); save(); close_(); render(); toast(t('task_added')); }
+
+function openPost(date,pid){
+  if(needClient()) return;
+  const p=pid?S.posts.find(x=>x.id===pid):{date,clientId:calClient!=='all'?calClient:'',type:'post'};
+  const pt=String(p.type||'post').toLowerCase().replace(/\s/g,'');
+  modal(`<h3>${pid?t('edit_post_t'):t('plan_post_t')}</h3><form onsubmit="savePost(event,'${pid||''}')"><div class="fgrid">
+    <div><label>${t('f_client')}</label><select name="clientId" required>${clientOpts(p.clientId)}</select></div>
+    <div><label>${t('f_date')} *</label><input type="date" name="date" required value="${p.date}"></div>
+    <div><label>${t('f_type')}</label><select name="type">${TYPES.map(ty=>`<option value="${ty}" ${pt===ty?'selected':''}>${t('ty_'+ty)}</option>`).join('')}</select></div>
+    <div><label>${t('f_status')}</label><select name="done"><option value="">${t('planned')}</option><option value="1" ${p.done?'selected':''}>${t('posted')}</option></select></div>
+    <div class="full"><label>${t('f_topic')}</label><input name="title" value="${esc(p.title)}" placeholder="${t('f_topic_ph')}"></div>
+  </div>${foot(pid?`delPost('${pid}')`:'',pid?t('save'):t('add_to_cal'))}</form>`);
+}
+function savePost(e,pid){
+  e.preventDefault(); const f=Object.fromEntries(new FormData(e.target)); f.done=!!f.done;
+  if(pid) Object.assign(S.posts.find(x=>x.id===pid),f); else S.posts.push({id:uid(),...f});
+  save(); close_(); render(); toast(t('saved_cal'));
+}
+function delPost(id){ S.posts=S.posts.filter(p=>p.id!==id); save(); close_(); render(); }
+
+/* Monthly plan builder */
+let planDays=new Set();
+function openPlan(cid){
+  if(needClient()) return;
+  planDays=new Set(); const mv=`${calMonth.getFullYear()}-${pad(calMonth.getMonth()+1)}`;
+  modal(`<h3>${t('plan_t')}</h3><form onsubmit="savePlan(event)"><div class="fgrid">
+    <div><label>${t('f_client')}</label><select name="clientId" required>${clientOpts(cid||(calClient!=='all'?calClient:''))}</select></div>
+    <div><label>${t('f_month')}</label><input type="month" name="month" value="${mv}" onchange="drawPick(this.value)"></div>
+    <div><label>${t('f_type')}</label><select name="type">${TYPES.map(ty=>`<option value="${ty}">${t('ty_'+ty)}</option>`).join('')}</select></div>
+    <div><label>${t('f_topic_opt')}</label><input name="title" placeholder="${t('f_same')}"></div>
+    <div class="full"><label>${t('quick')}</label><div class="row" style="flex-wrap:wrap">
+      <button type="button" class="chipbtn" onclick="quickPick('odd')">${t('qp_odd')}</button><button type="button" class="chipbtn" onclick="quickPick(3)">${t('qp_3')}</button>
+      <button type="button" class="chipbtn" onclick="quickPick('wk',[0,2,4])">${t('qp_a')}</button><button type="button" class="chipbtn" onclick="quickPick('wk',[6,1,3])">${t('qp_b')}</button>
+      <button type="button" class="chipbtn" onclick="quickPick('clear')">${t('clear')}</button></div></div>
+    <div class="full"><label>${t('pick_days')} <span id="pc"></span></label><div class="daypick" id="dp"></div></div>
+  </div>${foot('',t('add_to_cal'))}</form>`);
+  drawPick(mv);
+}
+function drawPick(mv){
+  const [y,m]=mv.split('-').map(Number), first=new Date(y,m-1,1), n=new Date(y,m,0).getDate(), off=(first.getDay()+1)%7;
+  let h=DOW_S[S.lang].map(d=>`<div class="meta" style="text-align:center">${d}</div>`).join('');
+  for(let i=0;i<off;i++) h+=`<button type="button" class="blank"></button>`;
+  for(let d=1;d<=n;d++){ const past=`${y}-${pad(m)}-${pad(d)}`<TODAY(); if(past) planDays.delete(d);
+    h+=`<button type="button" class="${planDays.has(d)?'on':''}" ${past?'disabled style="opacity:.3;cursor:default"':''} onclick="togDay(${d},this)">${d}</button>`; }
+  document.getElementById('dp').innerHTML=h; updPc(); drawPick.cur={y,m,n};
+}
+const updPc=()=>document.getElementById('pc').textContent=planDays.size?t('selected',planDays.size):'';
+function togDay(d,b){ planDays.has(d)?planDays.delete(d):planDays.add(d); b.classList.toggle('on'); updPc(); }
+function quickPick(mode,wd){
+  const {y,m,n}=drawPick.cur; planDays=new Set();
+  if(mode!=='clear') for(let d=1;d<=n;d++){
+    if(mode==='odd'&&d%2===1) planDays.add(d);
+    if(typeof mode==='number'&&(d-1)%mode===0) planDays.add(d);
+    if(mode==='wk'&&wd.includes(new Date(y,m-1,d).getDay())) planDays.add(d);
+  }
+  drawPick(`${y}-${pad(m)}`);
+}
+function savePlan(e){
+  e.preventDefault(); if(!planDays.size){ toast(t('pick_one')); return; }
+  const f=Object.fromEntries(new FormData(e.target)), [y,m]=f.month.split('-').map(Number), n=planDays.size;
+  [...planDays].sort((a,b)=>a-b).forEach(d=>S.posts.push({id:uid(),clientId:f.clientId,date:`${y}-${pad(m)}-${pad(d)}`,type:f.type,title:f.title,done:false}));
+  calMonth=new Date(y,m-1,1); save(); close_(); view='calendar'; render(); toast(t('planned_n',n));
+}
+
+/* Agenda modals & actions */
+function togEv(id,k){ const kk=k+'|'+id; if(S.evDone[kk]) delete S.evDone[kk]; else S.evDone[kk]=true; save(); render(); }
+function togTodo(eid,tid){ const x=S.events.find(e=>e.id===eid).todos.find(q=>q.id===tid); x.done=!x.done; save(); render(); }
+function openEvent(id,kind){
+  const e=id?S.events.find(x=>x.id===id):{kind:kind||'appointment',date:TODAY(),repeat:['prayer','reading'].includes(kind)?'daily':['service','church_meeting'].includes(kind)?'weekly':'none',title:kind?t('k_'+kind):''};
+  const wd=(e.wdays&&e.wdays.length)?e.wdays.map(Number):[parse(e.date).getDay()];
+  const dayOrder=[6,0,1,2,3,4,5];
+  modal(`<h3>${id?t('ev_edit'):t('ev_new')}</h3><form onsubmit="saveEvent(event,'${id||''}')"><div class="fgrid">
+    <div class="full"><label>${t('f_ev_title')}</label><input name="title" required value="${esc(e.title)}" placeholder="${t('f_ev_title_ph')}"></div>
+    <div><label>${t('f_kind')}</label><select name="kind">${CATS.map(c=>`<optgroup label="${t('cat_'+c)}">${Object.keys(KINDS).filter(k=>KINDS[k][0]===c).map(k=>`<option value="${k}" ${e.kind===k?'selected':''}>${KINDS[k][1]} ${t('k_'+k)}</option>`).join('')}</optgroup>`).join('')}</select></div>
+    <div><label>${t('f_repeat')}</label><select name="repeat" onchange="document.getElementById('wdbox').style.display=this.value==='weekly'?'':'none'">${['none','daily','weekly','monthly'].map(r=>`<option value="${r}" ${(e.repeat||'none')===r?'selected':''}>${t('r_'+r)}</option>`).join('')}</select></div>
+    <div><label>${t('f_date')}</label><input type="date" name="date" required value="${e.date}"></div>
+    <div><label>${t('f_time')}</label><input type="time" name="time" value="${esc(e.time)}"></div>
+    <div class="full" id="wdbox" style="${e.repeat==='weekly'?'':'display:none'}"><label>${t('f_wdays')}</label><div class="filters">${dayOrder.map((d,i)=>`<label class="chipbtn" style="margin:0;color:var(--ink);font-size:12.5px"><input type="checkbox" name="wd" value="${d}" ${wd.includes(d)?'checked':''} style="width:auto;margin-inline-end:4px">${DOW[S.lang][i]}</label>`).join('')}</div></div>
+    <div class="full"><label>${t('f_loc')}</label><input name="location" value="${esc(e.location)}"></div>
+    <div class="full"><label>${t('f_todos')}</label><textarea name="todos" rows="4" placeholder="${t('f_todos_ph')}">${esc((e.todos||[]).map(x=>x.text).join('\n'))}</textarea></div>
+    <div class="full"><label>${t('f_notes')}</label><textarea name="notes" rows="2">${esc(e.notes)}</textarea></div>
+  </div>${foot(id?`delEvent('${id}')`:'',t('save'))}</form>`);
+}
+function saveEvent(ev,id){
+  ev.preventDefault(); const fd=new FormData(ev.target), f=Object.fromEntries(fd);
+  f.wdays=fd.getAll('wd').map(Number);
+  const old=id?S.events.find(x=>x.id===id):null, oldT=old?old.todos||[]:[];
+  f.todos=String(f.todos||'').split('\n').map(s=>s.trim()).filter(Boolean).map(text=>{const o=oldT.find(x=>x.text===text); return o||{id:uid(),text,done:false};});
+  delete f.wd;
+  if(old) Object.assign(old,f); else S.events.push({id:uid(),...f});
+  save(); close_(); render(); toast(t('ev_saved'));
+}
+function delEvent(id){ confirmBox(t('confirm_del_ev'),()=>{ S.events=S.events.filter(e=>e.id!==id); save(); render(); }); }
+const soonSent=new Set();
+setInterval(()=>{
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  const n=new Date(), td=TODAY();
+  occ(td).forEach(e=>{ if(!e.time||evIsDone(e.id,td)) return; const [h,m]=e.time.split(':').map(Number);
+    const diff=(h*60+m)-(n.getHours()*60+n.getMinutes()), k=td+e.id;
+    if(diff<=15&&diff>=0&&!soonSent.has(k)){ soonSent.add(k); new Notification(kIcon(e)+' '+e.title,{body:t('n_soon',t('k_'+e.kind),fmtTime(e.time))+(e.location?' · '+e.location:'')}); } });
+},30000);
+
+/* Campaign modals */
+function openCampForm(id,cid){
+  if(needClient()) return;
+  const c=id?camp(id):{clientId:cid||(campClient!=='all'?campClient:''),objective:'messages',status:'active',platform:'Meta'};
+  modal(`<h3>${id?t('edit_camp_t'):t('new_camp_t')}</h3><form onsubmit="saveCamp(event,'${id||''}')"><div class="fgrid">
+    <div class="full"><label>${t('f_camp_name')}</label><input name="name" required value="${esc(c.name)}" placeholder="${t('f_camp_ph')}"></div>
+    <div><label>${t('f_client')}</label><select name="clientId" required>${clientOpts(c.clientId)}</select></div>
+    <div><label>${t('f_platform1')}</label><select name="platform">${['Meta','Facebook','Instagram','TikTok','Google','Snapchat'].map(p=>`<option ${c.platform===p?'selected':''}>${p}</option>`).join('')}</select></div>
+    <div><label>${t('f_objective')}</label><select name="objective">${OBJ.map(o=>`<option value="${o}" ${c.objective===o?'selected':''}>${t('obj_'+o)}</option>`).join('')}</select></div>
+    <div><label>${t('f_status')}</label><select name="status">${['active','paused','ended'].map(s=>`<option value="${s}" ${c.status===s?'selected':''}>${t('st_'+s)}</option>`).join('')}</select></div>
+    <div><label>${t('f_daily')} (${esc(S.currency)})</label><input type="number" step="any" name="dailyBudget" value="${esc(c.dailyBudget)}"></div>
+    <div><label>${t('f_target_cpr')} (${esc(S.currency)})</label><input type="number" step="any" name="targetCpr" value="${esc(c.targetCpr)}"></div>
+    <div><label>${t('f_target_roas')}</label><input type="number" step="any" name="targetRoas" value="${esc(c.targetRoas)}" placeholder="e.g. 3"></div>
+    <div><label>${t('f_start')}</label><input type="date" name="start" value="${esc(c.start||TODAY())}"></div>
+  </div>${foot(id?`delCamp('${id}')`:'',id?t('save'):t('create_camp'))}</form>`);
+}
+function saveCamp(e,id){
+  e.preventDefault(); const f=Object.fromEntries(new FormData(e.target));
+  if(id) Object.assign(camp(id),f); else { id=uid(); S.campaigns.push({id,entries:[],...f}); }
+  save(); close_(); view='campaigns'; render(); toast(t('camp_saved'));
+}
+function delCamp(id){ confirmBox(t('confirm_del_camp'),()=>{ S.campaigns=S.campaigns.filter(c=>c.id!==id); save(); render(); }); }
+
+const FIELDS=[['spend','spend'],['impressions','impr'],['reach','reach'],['clicks','clicks'],['results','results'],['revenue','revenue']];
+function openEntry(id,date){
+  const c=camp(id), d=date||TODAY(), ex=(c.entries||[]).find(e=>e.date===d)||{};
+  modal(`<h3>${t('nums_t',esc(c.name))}</h3><div class="hint">${t('nums_hint')}</div><form onsubmit="saveEntry(event,'${id}')"><div class="fgrid">
+    <div class="full"><label>${t('f_date')}</label><input type="date" name="date" value="${d}" required></div>
+    ${FIELDS.map(([f,l])=>`<div><label>${t(l)}${f==='spend'||f==='revenue'?' ('+esc(S.currency)+')':''}${f==='results'?' — '+t('obj_'+c.objective):''}</label><input type="number" step="any" min="0" name="${f}" value="${esc(ex[f])}" ${f==='spend'?'required':''}></div>`).join('')}
+  </div>${foot('',t('save_nums'))}</form>`);
+}
+function saveEntry(e,id){
+  e.preventDefault(); const f=Object.fromEntries(new FormData(e.target)); const c=camp(id);
+  FIELDS.forEach(([k])=>f[k]=f[k]===''?0:+f[k]);
+  c.entries=(c.entries||[]).filter(x=>x.date!==f.date); c.entries.push({id:uid(),...f});
+  save(); render(); openCamp(id,'last'); toast(t('nums_saved'));
+}
+function delEntry(cid,eid){ const c=camp(cid); c.entries=c.entries.filter(e=>e.id!==eid); save(); render(); openCamp(cid); }
+
+function spark(c){
+  const es=sorted(c).slice(-14).filter(e=>e.results>0); if(es.length<2) return '';
+  const vals=es.map(e=>e.spend/e.results), tc=+c.targetCpr, all=tc?[...vals,tc]:vals;
+  const mx=Math.max(...all)*1.1, mn=Math.min(...all)*0.9, W=600,H=90;
+  const X=i=>10+i*(W-20)/(vals.length-1), Y=v=>H-8-(v-mn)/(mx-mn||1)*(H-16);
+  const pts=vals.map((v,i)=>`${X(i)},${Y(v)}`).join(' ');
+  return `<h2 style="margin-top:18px">📉 ${t('trend')}</h2><svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="direction:ltr">
+    ${tc?`<line x1="0" x2="${W}" y1="${Y(tc)}" y2="${Y(tc)}" stroke="#c9a24a" stroke-dasharray="6 5" stroke-width="1.5"/><text x="${W-6}" y="${Y(tc)-5}" text-anchor="end" font-size="11" fill="#8a6a1f">${t('target')} ${nf(tc)}</text>`:''}
+    <polyline points="${pts}" fill="none" stroke="#0f1b33" stroke-width="2.5" stroke-linejoin="round"/>
+    ${vals.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" fill="${tc&&v>tc*1.2?'#c43d3d':'#0f1b33'}"><title>${es[i].date}: ${nf(v)}</title></circle>`).join('')}</svg>`;
+}
+function openCamp(id,p='7'){
+  const c=camp(id), cl=client(c.clientId), a=analyze(c,p), m=a.m, es=sorted(c).reverse();
+  modal(`<div class="top" style="margin-bottom:14px"><div><h3 style="margin:0">${esc(c.name)}</h3><div class="meta"><i class="dot" style="background:${cColor(c.clientId)}"></i> ${esc(cl?cl.name:'')} · ${t('obj_'+c.objective)} · ${esc(c.platform||'')}${+c.dailyBudget?' · '+t('f_daily')+': '+money(+c.dailyBudget):''}${+c.targetCpr?' · '+t('target')+': '+money(+c.targetCpr):''}</div></div>
+    <div class="row"><span class="pill ${a.health}">${t('h_'+a.health)}</span><button class="btn sm plain" onclick="openCampForm('${id}')">${t('edit')}</button></div></div>
+    <div class="calbar"><span class="meta">${t('period')}:</span><div class="filters">${[['last','p_last'],['7','p_7'],['all','p_all']].map(([v,l])=>`<button class="chipbtn ${p===v?'on':''}" onclick="openCamp('${id}','${v}')">${t(l)}</button>`).join('')}</div>
+      <button class="btn sm" style="margin-inline-start:auto" onclick="openEntry('${id}')">${t('add_nums')}</button></div>
+    ${m?`<div class="tiles wide">${tile(t('spend'),money(m.spend))}${tile(t('results'),nf(m.results,0))}${tile(t('cpr'),money(m.cpr))}${tile(t('ctr'),isFinite(m.ctr)?nf(m.ctr)+'%':'—')}
+      ${tile(t('cpc'),money(m.cpc))}${tile(t('cpm'),money(m.cpm))}${tile(t('freq'),nf(m.freq,1))}${tile(t('cvr'),isFinite(m.cvr)?nf(m.cvr)+'%':'—')}${tile(t('roas'),isFinite(m.roas)?nf(m.roas)+'x':'—')}
+      ${tile(t('impr'),nf(m.impressions,0))}${tile(t('reach'),nf(m.reach,0))}${tile(t('clicks'),nf(m.clicks,0))}</div>`:''}
+    <h2 style="margin-top:18px">💡 ${t('insights')}</h2>${a.items.map(insHtml).join('')}
+    ${spark(c)}
+    <h2 style="margin-top:18px">🗂 ${t('history')}</h2>
+    ${es.length?`<div class="tblwrap"><table><thead><tr><th>${t('f_date')}</th><th>${t('spend')}</th><th>${t('impr')}</th><th>${t('clicks')}</th><th>${t('results')}</th><th>${t('cpr')}</th><th>${t('ctr')}</th><th>${t('revenue')}</th><th></th></tr></thead><tbody>
+      ${es.map(e=>{const x=agg([e]);return `<tr><td><a href="#" onclick="event.preventDefault();openEntry('${id}','${e.date}')" style="color:var(--navy)">${fmt(e.date)}</a></td><td class="n">${nf(e.spend)}</td><td class="n">${nf(e.impressions,0)}</td><td class="n">${nf(e.clicks,0)}</td><td class="n">${nf(e.results,0)}</td><td class="n">${nf(x.cpr)}</td><td class="n">${isFinite(x.ctr)?nf(x.ctr)+'%':'—'}</td><td class="n">${e.revenue?nf(e.revenue):'—'}</td><td><button class="x" onclick="delEntry('${id}','${e.id}')">✕</button></td></tr>`}).join('')}
+    </tbody></table></div>`:`<div class="empty">${t('no_entries')}</div>`}
+    <div class="mfoot"><button class="btn plain" onclick="close_()">${t('cancel')}</button></div>`, true);
+}
+
+/* ================= Backup ================= */
+function exportData(){
+  const filename=`marina-backup-${TODAY()}.json`, data=JSON.stringify(S,null,2);
+  if(dlNs){ dlNs.save({filename,data}).catch(e=>{ if(e&&e.code!=='declined') toast(t('export_fail')); }); return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=filename; a.click();
+}
+function importData(inp){
+  const f=inp.files[0]; if(!f) return; const r=new FileReader();
+  r.onload=()=>{ let d; try{ d=JSON.parse(r.result); if(!d.clients||!d.posts) throw 0; }catch(e){ toast(t('bad_backup')); return; }
+    confirmBox(t('confirm_restore'),()=>{ S=norm(d); save(); render(); toast(t('restored')); },t('restore_btn')); };
+  r.readAsText(f); inp.value='';
+}
+
+/* ================= Notifications ================= */
+function askNotify(){
+  if(!('Notification' in window)) return toast(t('no_notif'));
+  Promise.resolve(Notification.requestPermission()).then(p=>{ render(); if(p==='granted') notifyNow(true); else toast(t('no_notif')); }).catch(()=>toast(t('no_notif')));
+}
+function notifyNow(force){
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  const I=todayInfo(); if(!force&&S.lastNotified===I.td) return;
+  const parts=[]; if(I.active.length) parts.push(t('n_check',I.active.length)); if(I.postsToday.length) parts.push(t('n_posts',I.postsToday.length));
+  if(I.overdue.length) parts.push(t('n_over',I.overdue.length)); if(I.newC.length) parts.push(t('n_new',I.newC.length)); if(I.alerts.length) parts.push(t('n_alerts',I.alerts.length));
+  if(I.agenda.length) parts.push(t('n_ag',I.agenda.length));
+  new Notification(t('n_title'),{body:parts.length?t('n_today')+parts.join(rtl()?'، ':', '):t('n_clear')});
+  S.lastNotified=I.td; save();
+}
+const nowHM=()=>{const n=new Date();return `${pad(n.getHours())}:${pad(n.getMinutes())}`;};
+setInterval(()=>{ if(nowHM()>=S.notifyTime) notifyNow(); },60000);
+
+/* ================= Init ================= */
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>go(b.dataset.view));
+document.querySelectorAll('.langs button').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+let lastDay=TODAY(); setInterval(()=>{ if(TODAY()!==lastDay){ lastDay=TODAY(); render(); } },60000);
+let wasMobile=isMobile(); addEventListener('resize',()=>{ if(isMobile()!==wasMobile){ wasMobile=isMobile(); render(); } });
+if(!inClaude && window.self===window.top && 'serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+setSync(syncState); initCloud();
+render();
+if(nowHM()>=S.notifyTime) notifyNow();
+</script>
+</body>
+</html>
